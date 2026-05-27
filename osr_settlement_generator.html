@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSR Settlement Generator</title>
+    <style>
+        :root {
+            /* Core Tones */
+            --md-sys-color-primary: hsl(100, 15%, 30%);
+            --md-sys-color-on-primary: hsl(100, 15%, 98%);
+            --md-sys-color-primary-container: hsl(100, 15%, 90%);
+            
+            --md-sys-color-secondary: hsl(130, 10%, 40%);
+            --md-sys-color-on-secondary: #ffffff;
+            
+            --md-sys-color-surface: hsl(100, 5%, 98%);
+            --md-sys-color-on-surface: hsl(100, 5%, 10%);
+            --md-sys-color-surface-variant: hsl(100, 10%, 90%);
+            --md-sys-color-on-surface-variant: hsl(100, 10%, 20%);
+            
+            --md-sys-color-outline: hsl(100, 10%, 50%);
+            
+            /* Highlight Tones (Muted/Pastel) */
+            --md-sys-color-highlight: hsl(280, 40%, 85%);
+            --md-sys-color-on-highlight: hsl(280, 40%, 20%);
+
+            /* Spacing (MD3 Expressive) */
+            --spacing-unit: 4px;
+            --radius-xs: 4px;
+            --radius-s: 8px;
+            --radius-m: 12px;
+            --radius-l: 16px;
+            --radius-xl: 28px;
+            --radius-full: 9999px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: var(--md-sys-color-surface);
+            color: var(--md-sys-color-on-surface);
+            padding: calc(var(--spacing-unit) * 6);
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: calc(var(--spacing-unit) * 4);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: calc(var(--spacing-unit) * 2);
+        }
+
+        h1 {
+            color: var(--md-sys-color-primary);
+            font-size: 2rem;
+            margin-bottom: calc(var(--spacing-unit) * 2);
+        }
+
+        button {
+            background-color: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+            border: none;
+            padding: calc(var(--spacing-unit) * 3) calc(var(--spacing-unit) * 6);
+            border-radius: var(--radius-xl);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        button:hover {
+            background-color: hsl(100, 15%, 25%);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .card {
+            background-color: var(--md-sys-color-surface-variant);
+            color: var(--md-sys-color-on-surface-variant);
+            border-radius: var(--radius-l);
+            padding: calc(var(--spacing-unit) * 5);
+            border: 1px solid var(--md-sys-color-outline);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .settlement-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            border-bottom: 2px solid var(--md-sys-color-primary);
+            padding-bottom: calc(var(--spacing-unit) * 2);
+            margin-bottom: calc(var(--spacing-unit) * 4);
+        }
+
+        .settlement-name {
+            font-size: 1.75rem;
+            font-weight: bold;
+            color: var(--md-sys-color-primary);
+        }
+
+        .settlement-type {
+            background-color: var(--md-sys-color-highlight);
+            color: var(--md-sys-color-on-highlight);
+            padding: calc(var(--spacing-unit) * 1) calc(var(--spacing-unit) * 3);
+            border-radius: var(--radius-full);
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: calc(var(--spacing-unit) * 3);
+        }
+
+        @media (min-width: 600px) {
+            .grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .full-width {
+                grid-column: span 2;
+            }
+        }
+
+        .data-block h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--md-sys-color-secondary);
+            margin-bottom: calc(var(--spacing-unit) * 1);
+        }
+
+        .data-block p {
+            font-size: 1.05rem;
+            line-height: 1.4;
+        }
+
+        .npc-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: calc(var(--spacing-unit) * 2);
+        }
+
+        .npc-item {
+            background-color: rgba(255, 255, 255, 0.4);
+            padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 3);
+            border-radius: var(--radius-s);
+            border-left: 4px solid var(--md-sys-color-primary);
+        }
+
+        .history-section {
+            margin-top: calc(var(--spacing-unit) * 4);
+        }
+
+        .history-section h2 {
+            font-size: 1.2rem;
+            color: var(--md-sys-color-secondary);
+            margin-bottom: calc(var(--spacing-unit) * 2);
+        }
+
+        .history-log {
+            display: flex;
+            flex-direction: column;
+            gap: calc(var(--spacing-unit) * 2);
+            max-height: 250px;
+            overflow-y: auto;
+            padding-right: var(--spacing-unit);
+        }
+
+        .history-item {
+            font-size: 0.9rem;
+            padding: calc(var(--spacing-unit) * 2);
+            background-color: var(--md-sys-color-primary-container);
+            border-radius: var(--radius-s);
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>OSR Settlement Generator</h1>
+            <button id="generate-btn">Generate New Settlement</button>
+        </header>
+
+        <main>
+            <div id="settlement-card" class="card hidden">
+                <div class="settlement-header">
+                    <span id="display-name" class="settlement-name">Oakhaven</span>
+                    <span id="display-type" class="settlement-type">Village</span>
+                </div>
+                
+                <div class="grid">
+                    <div class="data-block">
+                        <h3>Government & Ruler</h3>
+                        <p id="display-government">Feudal Lord</p>
+                    </div>
+                    <div class="data-block">
+                        <h3>Local Economy & Specialty</h3>
+                        <p id="display-economy">Timber & Woodworking</p>
+                    </div>
+                    <div class="data-block full-width">
+                        <h3>Current Trouble / Problem</h3>
+                        <p id="display-trouble">A creeping blight in the surrounding woods.</p>
+                    </div>
+                    <div class="data-block full-width">
+                        <h3>Notable Local NPCs</h3>
+                        <ul id="display-npcs" class="npc-list">
+                            </ul>
+                    </div>
+                </div>
+            </div>
+
+            <section class="history-section">
+                <h2>Recent Finds</h2>
+                <div id="history-log" class="history-log">
+                    </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // --- DATA TABLES ---
+        const prefixes = ["Oakh", "Wolf", "Black", "Stone", "Mud", "Red", "Grey", "Green", "Deep", "High", "Crag", "River", "Cross", "Crow", "Iron", "Bog"];
+        const suffixes = ["aven", "ford", "wood", "wall", "bridge", "marrow", "barrow", "water", "peak", "glen", "keep", "mill", "mire", "ridge", "run", "town"];
+
+        const types = [
+            "Outpost / Campsite (Pop: 10-50)",
+            "Thorpe / Hamlet (Pop: 50-100)",
+            "Village (Pop: 100-500)",
+            "Fortified Village (Pop: 200-600)",
+            "Small Town (Pop: 500-2000)",
+            "Ruined Settlement (Squatters/Cultists)"
+        ];
+
+        const governments = [
+            "Anarchic (Might makes right, no formal law)",
+            "Council of Elders (Traditional, stubborn, slow to act)",
+            "Feudal Lord / Castellan (Demanding, tax-heavy, protective)",
+            "Religious Cult / Zealot Hierarchy (Dogmatic, suspicious of outsiders)",
+            "Merchant Guild Representative (Greedy, transactional, precise)",
+            "A Secret Syndicate / Criminal Kingpin rules from the shadows"
+        ];
+
+        const economies = [
+            "Agriculture (Grain, livestock, or weird subterranean fungus)",
+            "Mining (Iron, silver, copper, or strange glowing crystals)",
+            "Trapping & Timber (Valuable pelts, rare medicinal woods)",
+            "Smuggling & Contraband (Hidden routes, illegal trade)",
+            "Ancient Ruins Tourism / Scavenging (Sells old relics and maps)",
+            "Strategic Chokepoint (Exorbitant bridge/road tolls)"
+        ];
+
+        const troubles = [
+            "An ancient disease or magical blight is rotting crops/livestock.",
+            "Bandits or humanoids are demanding escalating protection money.",
+            "People disappear when the moon is full; a werewolf or cult is suspected.",
+            "The water supply has gone foul, smelling of brimstone and copper.",
+            "Two powerful local families are on the verge of an all-out blood feud.",
+            "A nearby dungeon/tomb has recently broken open, spilling weak monsters into the fringe.",
+            "A corrupt tax collector arrived with heavy muscle, bleeding the populace dry.",
+            "Unseasonal weather (perpetual fog/unending frost) threatens survival."
+        ];
+
+        const npcRoles = ["Blacksmith", "Hedge Wizard", "Tavern Keeper", "Beaten-down Guard", "Shifty Merchant", "Desperate Peasant", "Retired Adventurer", "Local Priest"];
+        const npcTraits = ["Nervous tic", "Greedy but cowardly", "Excessively religious", "Scarred and silent", "Overly welcoming", "Smells of cheap ale", "Possesses a weird heirloom", "Blind in one eye"];
+        const npcHooks = [
+            "knows a secret entrance to a nearby ruin.",
+            "wants their rival discredited or ruined.",
+            "is secretly working for the local bandits/monsters.",
+            "lost a family member to the local wilderness threat recently.",
+            "is looking to hire muscle for a quick, dangerous heist.",
+            "unwittingly possesses a cursed item they want to get rid of."
+        ];
+
+        // --- GENERATOR LOGIC ---
+        function getRandom(array) {
+            return array[Math.floor(Math.random() * array.length)];
+        }
+
+        function generateSettlement() {
+            const name = getRandom(prefixes) + getRandom(suffixes);
+            const type = getRandom(types);
+            const government = getRandom(governments);
+            const economy = getRandom(economies);
+            const trouble = getRandom(troubles); // Fixing local variable shadowing or array reference below
+            
+            // Re-grabbing random trouble safely
+            const selectedTrouble = getRandom(troubles);
+
+            // Generate 2 NPCs
+            const npcs = [];
+            for(let i = 0; i < 2; i++) {
+                let role = getRandom(npcRoles);
+                let trait = getRandom(npcTraits);
+                let hook = getRandom(npcHooks);
+                npcs.push(`<strong>The ${role}</strong> (${trait}) — He/She ${hook}`);
+            }
+
+            return { name, type, government, economy, trouble: selectedTrouble, npcs };
+        }
+
+        // --- UI & STATE ---
+        let history = [];
+
+        const genBtn = document.getElementById("generate-btn");
+        const card = document.getElementById("settlement-card");
+        const displayName = document.getElementById("display-name");
+        const displayType = document.getElementById("display-type");
+        const displayGov = document.getElementById("display-government");
+        const displayEco = document.getElementById("display-economy");
+        const displayTrouble = document.getElementById("display-trouble");
+        const displayNpcs = document.getElementById("display-npcs");
+        const historyLog = document.getElementById("history-log");
+
+        function updateUI(settlement) {
+            card.classList.remove("hidden");
+            displayName.textContent = settlement.name;
+            displayType.textContent = settlement.type;
+            displayGov.textContent = settlement.government;
+            displayEco.textContent = settlement.economy;
+            displayTrouble.textContent = settlement.trouble;
+
+            displayNpcs.innerHTML = "";
+            settlement.npcs.forEach(npc => {
+                const li = document.createElement("li");
+                li.className = "npc-item";
+                li.innerHTML = npc;
+                displayNpcs.appendChild(li);
+            });
+        }
+
+        function updateHistory(settlement) {
+            // Add to front of history array
+            history.unshift(settlement);
+            if (history.length > 10) history.pop(); // Keep last 10
+
+            historyLog.innerHTML = "";
+            history.forEach((item, index) => {
+                const div = document.createElement("div");
+                div.className = "history-item";
+                div.textContent = `${item.name} (${item.type.split(' (')[0]})`;
+                div.addEventListener("click", () => updateUI(item));
+                historyLog.appendChild(div);
+            });
+        }
+
+        genBtn.addEventListener("click", () => {
+            const settlement = generateSettlement();
+            updateUI(settlement);
+            updateHistory(settlement);
+        });
+    </script>
+</body>
+</html>

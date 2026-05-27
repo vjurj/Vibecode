@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design Token Playground</title>
+    <style>
+        /* ====================================== */
+        /* 1. CSS Variables & Global Styles (MD3 Foundation) */
+        /* ====================================== */
+
+        :root {
+            /* Default/Fallback Tokens (Will be overwritten by JS) */
+            --color-primary: #6750A4;      /* Placeholder Primary */
+            --color-on-primary: #FFFFFF;    /* Text on Primary */
+            --color-surface: #F7F2FA;       /* Background/Card Surface */
+            --color-on-surface: #1C1B1F;   /* Default Text Color */
+            --color-error: #B3261E;        /* Required Error State */
+
+            /* Derived Colors (Simulated Tints/Shades) */
+            --color-primary-light: color-mix(in srgb, var(--color-primary) 70%, white);
+            --color-primary-medium: var(--color-primary);
+            --color-primary-dark: color-mix(in srgb, var(--color-primary) 85%, black);
+
+            /* MD3 Spacing & Radius Defaults */
+            --spacing-unit: 0.5rem; /* Corresponds to 8dp at 16px base font size */
+            --border-radius-m: 12px;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif, system-ui; /* Fallback to system fonts */
+            background-color: var(--color-surface);
+            color: var(--color-on-surface);
+            margin: 0;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+
+        /* Layout Containers */
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        section {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--border-radius-m);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        h1, h2 {
+            color: var(--color-on-surface);
+            margin-top: 0;
+        }
+
+        /* ====================================== */
+        /* 2. Controls & Inputs Styling */
+        /* ====================================== */
+        #controls input[type="color"], #primaryColorInput, #randomizer {
+            width: 100%;
+            padding: var(--spacing-unit);
+            margin-bottom: 1rem;
+            border: 1px solid #ccc;
+            border-radius: calc(var(--border-radius-m) / 2);
+            box-sizing: border-box;
+        }
+
+        .color-swatch-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .swatch {
+            height: 50px;
+            border-radius: var(--border-radius-m);
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            color: var(--color-on-surface); /* Fallback text color */
+            padding: 5px;
+            text-align: center;
+        }
+
+        .swatch:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+
+        /* ====================================== */
+        /* 3. Component Styling (Using Tokens) */
+        /* ====================================== */
+
+        /* Typography */
+        h1 { font-size: 2.5rem; margin-bottom: var(--spacing-unit); }
+        h2 { font-size: 1.8rem; margin-bottom: calc(var(--spacing-unit) * 1.5); border-bottom: 1px solid var(--color-primary-light); padding-bottom: var(--spacing-unit);}
+
+        p {
+            margin-bottom: var(--spacing-unit);
+            /* Text Highlighting Example */
+            background-color: rgba(255, 204, 0, 0.1); /* Muted yellow highlight */
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        /* Buttons */
+        .button {
+            display: inline-block;
+            padding: var(--spacing-unit) calc(var(--spacing-unit) * 2);
+            border-radius: var(--border-radius-m);
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s, box-shadow 0.2s;
+            text-align: center;
+            border: none;
+        }
+
+        /* Primary Button */
+        .btn-primary {
+            background-color: var(--color-primary);
+            color: var(--color-on-primary);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-primary:hover {
+            background-color: color-mix(in srgb, var(--color-primary) 85%, black);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Secondary/Outline Button */
+        .btn-secondary {
+             background-color: transparent;
+             border: 1px solid var(--color-primary-light);
+             color: var(--color-primary);
+        }
+        .btn-secondary:hover {
+            background-color: color-mix(in srgb, var(--color-primary) 90%, white);
+        }
+
+
+        /* Form Elements */
+        input[type="text"], select, textarea {
+            width: calc(100% - calc(var(--spacing-unit) * 2));
+            padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5);
+            border: 1px solid #ccc;
+            border-radius: var(--border-radius-m);
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(103, 80, 164, 0.2); /* Focus ring simulation */
+        }
+
+        /* Checkboxes & Radios (MD style grouping) */
+        .form-group {
+            margin-bottom: calc(var(--spacing-unit) * 2);
+            display: flex;
+            align-items: center;
+        }
+        .form-group input[type="checkbox"], .form-group input[type="radio"] {
+             /* Make native elements look better */
+            width: auto;
+            margin-right: var(--spacing-unit);
+            transform: scale(1.2); 
+        }
+
+        /* Cards */
+        .card {
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            padding: calc(var(--spacing-unit) * 2);
+            margin-bottom: calc(var(--spacing-unit) * 2);
+            background-color: var(--color-surface);
+            border-radius: var(--border-radius-m);
+        }
+
+        /* ====================================== */
+        /* 4. Output Area Styling (CSS Preview) */
+        /* ====================================== */
+        #cssOutput {
+            background-color: #2d2d2d;
+            color: #e0e0e0;
+            padding: var(--spacing-unit);
+            border-radius: var(--border-radius-m) 0 0 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            min-height: 150px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header style="text-align: center; margin-bottom: 2rem;">
+        <h1>🎨 Design Token Playground</h1>
+        <p>Set your primary color and instantly preview the generated material design system tokens.</p>
+    </header>
+
+    <div class="container">
+        <section id="controls-panel">
+            <h2>1. Set Primary Token</h2>
+
+            <label for="primaryColorInput" style="display: block; margin-bottom: 0.5rem;">Select Muted/Earthly Base Color:</label>
+            <input type="color" id="primaryColorInput" value="#6750A4">
+
+            <div style="margin-top: 1rem;">
+                <button onclick="randomizePrimary()" class="button btn-secondary" style="width: auto; margin-right: 10px;">🎲 Randomize Color</button>
+            </div>
+
+            <h3>Generated Palette Swatches</h3>
+            <p>These swatches represent the core roles (Surface, Accent, etc.). Click a swatch to set it as the new primary color.</p>
+
+            <div class="color-swatch-grid" id="paletteSwatches">
+                </div>
+
+            <hr style="margin: 2rem 0;">
+
+            <h2>2. Live CSS Output</h2>
+            <button onclick="copyCss()" class="button btn-primary" style="width: 100%; margin-bottom: 10px;">📋 Copy Tokens to Clipboard</button>
+            <textarea id="cssOutput" readonly placeholder="Generated CSS will appear here..."></textarea>
+        </section>
+
+        <section id="preview-area">
+            <h2>3. Component Preview</h2>
+            <p>All components below use CSS variables defined by the primary token above. Observe how changing the color updates everything instantly.</p>
+
+            <h3>Typography & Text</h3>
+            <h1 style="padding: 0;">This is a Level 1 Heading (H1)</h1>
+            <h2 style="font-size: 1.8rem; padding: 0;">This is a Section Title (H2)</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. This text block demonstrates standard body copy and how the background color influences readability.</p>
+            <p style="background-color: rgba(139, 69, 19, 0.1); color: var(--color-on-surface);">This paragraph includes a specific colored highlight (simulating emphasis text).</p>
+
+            <h3>Interactive Elements</h3>
+            <div style="margin-bottom: 2rem;">
+                <button class="button btn-primary">Primary Button</button>
+                <button class="button btn-secondary" style="margin-left: 10px;">Secondary Button</button>
+            </div>
+
+            <h4>Form Inputs</h4>
+            <div class="card" style="border-color: var(--color-primary-light);">
+                <label for="textInput">Text Input Field:</label><br>
+                <input type="text" id="textInput" placeholder="Enter a name...">
+
+                <label for="selectInput" style="display: block; margin-top: 1rem;">Select Dropdown:</label>
+                <select id="selectInput">
+                    <option>Option One</option>
+                    <option>Option Two</option>
+                </select>
+
+                <div class="form-group" style="margin-top: 1rem;">
+                     <input type="checkbox" id="checkDemo"><label for="checkDemo">I agree to the terms</label>
+                </div>
+
+                 <div class="form-group">
+                    <input type="radio" id="radioA" name="radioGroup"><label for="radioA">Option A</label>
+                    <input type="radio" id="radioB" name="radioGroup"><label for="radioB">Option B</label>
+                </div>
+
+                <label for="rangeInput" style="display: block; margin-top: 1.5rem;">Range Control:</label>
+                <input type="range" id="rangeInput" min="0" max="100" value="50">
+            </div>
+
+             <h3>Component Showcase</h3>
+            <h4>Card Component Example</h4>
+            <div class="card" style="border-color: var(--color-primary); background-color: color-mix(in srgb, var(--color-surface) 95%, var(--color-primary));">
+                <strong>Card Title</strong> <br>
+                <em>Subtitle describing this card component.</em>
+                <p style="margin-top: 10px;">This is a self-contained unit that uses the surface background and primary border color to stand out.</p>
+            </div>
+
+        </section>
+    </div>
+
+    <script>
+        // ===============================================================
+        // CORE DATA & INITIAL STATE
+        // ===============================================================
+
+        // Curated list of muted, earthly, or pastel tones, including required ones.
+        const MutedPalette = [
+            { name: "sage", hex: "#A7C957" }, 
+            { name: "lilac", hex: "#B19CD9" },
+            { name: "brick orange", hex: "#D87367" }, 
+            { name: "olive", hex: "#A0B25C" },
+            { name: "dusty blue", hex: "#9DB3BF" },
+            { name: "terracotta", hex: "#C38D7F" },
+            { name: "pale lavender", hex: "#DCD0E4" },
+            { name: "sage green", hex: "#A2B59B" },
+        ];
+
+        const state = {
+            primaryHex: MutedPalette[1].hex, // Start with lilac as default example
+        };
+
+        // Connect the native color input element to the token generator
+        document.getElementById('primaryColorInput').addEventListener('input', (e) => {
+            updateDesignTokens(e.target.value);
+        });
+
+        // ===============================================================
+        // TOKEN MANAGEMENT AND RENDERING
+        // ===============================================================
+
+        /**
+         * 1. Updates the CSS Custom Properties (Tokens) in the root element (:root).
+         * @param {string} hex - The new primary color hex code.
+         */
+        function updateDesignTokens(hex) {
+            state.primaryHex = hex;
+            document.getElementById('primaryColorInput').value = hex;
+            document.documentElement.style.setProperty('--color-primary', hex);
+
+            // Simple simulation of derived colors based on contrast/lightness shift
+            const rgbMatch = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            if (rgbMatch) {
+                const r = parseInt(rgbMatch[1], 16);
+                const g = parseInt(rgbMatch[2], 16);
+                const b = parseInt(rgbMatch[3], 16);
+
+                // Update secondary tokens based on the primary color change
+                document.documentElement.style.setProperty('--color-primary-light', `rgba(${r}, ${g}, ${b}, 0.2)`);
+                document.documentElement.style.setProperty('--color-primary-dark', `color-mix(in srgb, ${hex} 80%, black)`);
+
+                // Update surface/text colors based on contrast logic (simple heuristic)
+                const isDark = (r * 0.299 + g * 0.587 + b * 0.114) / 255 < 0.5;
+                document.documentElement.style.setProperty('--color-on-surface', isDark ? '#FFF' : '#111');
+            }
+
+            // Re-render everything to pick up the new CSS variables
+            generatePaletteSwatches();
+            applyTokensToComponents();
+            updateCssOutput();
+        }
+
+
+        /**
+         * 2. Generates and displays swatches for the palette section.
+         */
+        function generatePaletteSwatches() {
+            const container = document.getElementById('paletteSwatches');
+            container.innerHTML = '';
+
+            // Add required/core colors first for visibility
+            const coreColors = [
+                { name: "Primary", hex: state.primaryHex }, 
+                { name: "Surface (System)", hex: '#F7F2FA' } 
+            ];
+             
+            // Add the fixed muted list colors
+            MutedPalette.forEach(c => {
+                coreColors.push({ name: c.name, hex: c.hex });
+            });
+
+            let htmlContent = '';
+            coreColors.forEach(colorDef => {
+                let displayHex = colorDef.hex;
+                let titleText = colorDef.name;
+                
+                // Use the built-in function to find out if text color should be dark or light
+                let textColor = getContrastColor(displayHex);
+
+                htmlContent += `
+                    <div class="swatch" style="background-color: ${displayHex}; color: ${textColor};" 
+                         data-hex="${colorDef.hex}" data-name="${titleText}" 
+                         onclick="selectSwatch('${colorDef.hex}')">
+                        ${titleText}
+                    </div>`;
+            });
+
+            container.innerHTML = htmlContent;
+        }
+
+
+        /**
+         * 3. Applies the current CSS variables to all component elements in the DOM.
+         */
+        function applyTokensToComponents() {
+            document.querySelectorAll('.button').forEach(el => {
+                if (el.classList.contains('btn-primary')) {
+                    el.style.backgroundColor = 'var(--color-primary)';
+                }
+            });
+        }
+
+        /**
+         * 4. Updates the code output area with current token values.
+         */
+        function updateCssOutput() {
+            const css = `
+/* =============================================== */
+/* DESIGN TOKENS (CSS Variables)                  */
+/* Generated by Token Playground - Primary: ${state.primaryHex}  */
+/* =============================================== */
+
+:root {
+    /* CORE PALETTE */
+    --color-primary: ${state.primaryHex};        /* Main Accent Color */
+    --color-on-primary: #FFFFFF;                /* Text color when on Primary background */
+    --color-surface: #F7F2FA;                  /* Background / Card Base */
+    --color-on-surface: ${getContrastColor(state.primaryHex)}; /* Default text color */
+    --color-error: ${MutedPalette.find(c => c.name === 'brick orange').hex}; 
+
+    /* DERIVED SHADES (Simulated Tints/Shades) */
+    --color-primary-light: color-mix(in srgb, var(--color-primary) 20%, transparent);
+    --color-primary-medium: ${state.primaryHex};     /* Base color */
+    --color-primary-dark: color-mix(in srgb, var(--color-primary) 80%, black);
+
+    /* SPACING & RADIUS (MD3 Guidelines) */
+    --spacing-unit: 0.5rem; /* Equivalent to 8dp spacing base unit */
+    --border-radius-m: 12px; /* Consistent corner rounding */
+}
+
+/* =============================================== */
+/* COMPONENTS USING TOKENS                         */
+/* =============================================== */
+
+body {
+    background-color: var(--color-surface);
+    color: var(--color-on-surface);
+}
+
+button.btn-primary {
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+}
+
+input[type="text"], select, textarea {
+    border-radius: var(--border-radius-m);
+}
+            `.trim();
+            document.getElementById('cssOutput').value = css;
+        }
+
+
+        // ===============================================================
+        // UTILITY FUNCTIONS & EVENT HANDLERS
+        // ===============================================================
+
+        /** Helper to convert HEX to RGB object for contrast checking */
+        function hexToRgb(hex) {
+            const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+            hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
+
+        /** Calculates perceived brightness (Luminosity formula) */
+        function getContrastColor(hex) {
+             const rgb = hexToRgb(hex);
+             if (!rgb) return '#111';
+             
+             // Luminosity calculation for contrast checking: L = 0.299*R + 0.587*G + 0.114*B
+             const luminosity = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
+             
+             // If background is light, use dark text (#111); if dark, use white text (#FFF)
+             return luminosity > 0.6 ? '#111' : '#FFF';
+        }
+
+
+        /** Event handler when a swatch is clicked */
+        window.selectSwatch = function(hex) {
+            // Guard against handling raw CSS 'var(--...)' values dynamically
+            if(hex.startsWith('#')) {
+                updateDesignTokens(hex);
+            }
+        };
+
+        /** Randomizes the primary color to one of the muted tones */
+        window.randomizePrimary = function() {
+            const randomIndex = Math.floor(Math.random() * MutedPalette.length);
+            selectSwatch(MutedPalette[randomIndex].hex);
+        }
+
+        /** Copies the generated CSS to the clipboard */
+        window.copyCss = async function() {
+            const outputElement = document.getElementById('cssOutput');
+            try {
+                await navigator.clipboard.writeText(outputElement.value);
+                alert('✅ Success! Design tokens copied to clipboard.');
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                alert('❌ Failed to copy. Please manually select and copy the text block.');
+            }
+        }
+
+        /** Initializer function */
+        function initializeApp() {
+            // Set initial tokens based on default state value (Lilac)
+            updateDesignTokens(state.primaryHex);
+        }
+
+        // Run setup when the document is fully loaded
+        window.onload = initializeApp;
+    </script>
+</body>
+</html>
