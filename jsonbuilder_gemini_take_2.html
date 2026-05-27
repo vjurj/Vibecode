@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JSON Field Builder</title>
+  <style>
+    :root {
+      /* Core Tones */
+      --md-sys-color-primary: hsl(100, 15%, 30%);
+      --md-sys-color-on-primary: hsl(100, 15%, 98%);
+      --md-sys-color-primary-container: hsl(100, 15%, 90%);
+
+      --md-sys-color-secondary: hsl(130, 10%, 40%);
+      --md-sys-color-on-secondary: #ffffff;
+
+      --md-sys-color-surface: hsl(100, 5%, 98%);
+      --md-sys-color-on-surface: hsl(100, 5%, 10%);
+      --md-sys-color-surface-variant: hsl(100, 10%, 90%);
+      --md-sys-color-on-surface-variant: hsl(100, 10%, 20%);
+
+      --md-sys-color-outline: hsl(100, 10%, 50%);
+
+      /* Highlight Tones */
+      --md-sys-color-highlight: hsl(280, 40%, 85%);
+      --md-sys-color-on-highlight: hsl(280, 40%, 20%);
+
+      /* Spacing */
+      --spacing-unit: 4px;
+      --radius-xs: 4px;
+      --radius-s: 8px;
+      --radius-m: 12px;
+      --radius-l: 16px;
+      --radius-xl: 28px;
+      --radius-full: 9999px;
+    }
+
+    body {
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--md-sys-color-surface);
+      color: var(--md-sys-color-on-surface);
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 800px;
+      background: var(--md-sys-color-surface-variant);
+      padding: calc(var(--spacing-unit) * 6);
+      border-radius: var(--radius-l);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    h2 {
+      margin: 0;
+      color: var(--md-sys-color-primary);
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 12px;
+      margin-bottom: 12px;
+      align-items: center;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(5px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    input {
+      padding: 10px 14px;
+      border: 1px solid var(--md-sys-color-outline);
+      border-radius: var(--radius-s);
+      background: var(--md-sys-color-surface);
+      color: var(--md-sys-color-on-surface);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus {
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 2px var(--md-sys-color-primary-container);
+    }
+
+    .actions {
+      margin-top: 24px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      font-weight: 600;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .btn-add {
+      background-color: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+    }
+
+    .btn-save {
+      background-color: var(--md-sys-color-secondary);
+      color: var(--md-sys-color-on-secondary);
+    }
+
+    .btn-import {
+      background-color: var(--md-sys-color-highlight);
+      color: var(--md-sys-color-on-highlight);
+    }
+
+    .btn-delete {
+      background-color: transparent;
+      color: #ba1a1a;
+      padding: 8px;
+    }
+
+    .btn-delete:hover {
+      background: rgba(186, 26, 26, 0.1);
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    pre {
+      background: var(--md-sys-color-on-surface);
+      color: var(--md-sys-color-surface);
+      padding: 16px;
+      border-radius: var(--radius-m);
+      margin-top: 24px;
+      overflow-x: auto;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <header>
+      <h2>JSON Builder</h2>
+    </header>
+
+    <div id="fieldContainer">
+    </div>
+
+    <div class="actions">
+      <button class="btn-add" onclick="addField()">+ Add Field</button>
+      <button class="btn-import" onclick="triggerImport()">Import JSON</button>
+      <button class="btn-save" onclick="exportJSON()">Download .json</button>
+      <input type="file" id="fileInput" accept=".json" onchange="importJSON(event)">
+    </div>
+
+    <pre id="preview">{}</pre>
+  </div>
+
+  <script>
+    let fields = [{ id: Date.now(), key: "", value: "" }];
+
+    function render() {
+      const container = document.getElementById('fieldContainer');
+      // We only full-render if a field is added or deleted to maintain focus.
+      // For simple typing, we update the data model silently.
+      container.innerHTML = '';
+      fields.forEach(field => {
+        const row = document.createElement('div');
+        row.className = 'field-row';
+        row.innerHTML = `
+                <input type="text" placeholder="Key" value="${field.key}" 
+                    oninput="updateField(${field.id}, 'key', this.value)">
+                <input type="text" placeholder="Value" value="${field.value}" 
+                    oninput="updateField(${field.id}, 'value', this.value)">
+                <button class="btn-delete" onclick="deleteField(${field.id})">✕</button>
+            `;
+        container.appendChild(row);
+      });
+      updatePreview();
+    }
+
+    function addField() {
+      fields.push({ id: Date.now(), key: "", value: "" });
+      render();
+    }
+
+    function deleteField(id) {
+      fields = fields.filter(f => f.id !== id);
+      render();
+    }
+
+    function updateField(id, prop, val) {
+      const field = fields.find(f => f.id === id);
+      if (field) {
+        field[prop] = val;
+      }
+      updatePreview();
+    }
+
+    function updatePreview() {
+      const jsonObj = {};
+      fields.forEach(f => {
+        if (f.key) jsonObj[f.key] = f.value;
+      });
+      document.getElementById('preview').textContent = JSON.stringify(jsonObj, null, 4);
+    }
+
+    function triggerImport() {
+      document.getElementById('fileInput').click();
+    }
+
+    function importJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          fields = Object.entries(data).map(([key, value]) => ({
+            id: Math.random() + Date.now(),
+            key: key,
+            value: typeof value === 'object' ? JSON.stringify(value) : value
+          }));
+          if (fields.length === 0) addField();
+          render();
+        } catch (err) {
+          alert("Invalid JSON file.");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function exportJSON() {
+      const jsonObj = {};
+      fields.forEach(f => {
+        if (f.key) jsonObj[f.key] = f.value;
+      });
+      const blob = new Blob([JSON.stringify(jsonObj, null, 4)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = "data.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Initial load
+    render();
+  </script>
+
+</body>
+
+</html>

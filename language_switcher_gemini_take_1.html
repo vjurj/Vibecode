@@ -1,0 +1,230 @@
+<style id="generated-tokens">
+  :root {
+    /* Default Tokens (Will be overridden by JS) */
+    --primary-h: 120;
+    --primary-s: 20%;
+    --primary-l: 40%;
+
+    /* MD3 Spacing & Radius Defaults */
+    --spacing-unit: 4px;
+    --radius-none: 0px;
+    --radius-xs: 4px;
+    --radius-s: 8px;
+    --radius-m: 12px;
+    --radius-l: 16px;
+    --radius-xl: 28px;
+    --radius-full: 9999px;
+  }
+</style>
+<style>
+  /* Base UI Styling - Not part of the design tokens */
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    display: grid;
+    grid-template-columns: 400px 1fr;
+    height: 100vh;
+    background: #f5f5f5;
+    color: #1c1b1f;
+  }
+
+  /* Sidebar Controls */
+  aside {
+    background: #fff;
+    border-right: 1px solid #e0e0e0;
+    padding: 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  select,
+  button {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  button.primary-btn {
+    background: #333;
+    color: white;
+    border: none;
+    font-weight: bold;
+  }
+
+  button.primary-btn:hover {
+    background: #000;
+  }
+
+  /* Preview Area */
+  main {
+    padding: 40px;
+    overflow-y: auto;
+    background-color: var(--md-sys-color-surface);
+  }
+
+  .swatch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+
+  .swatch {
+    height: 80px;
+    border-radius: var(--radius-m);
+    display: flex;
+    align-items: flex-end;
+    padding: 8px;
+    font-size: 10px;
+    font-weight: bold;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  /* Component Showcase Styles */
+  .showcase-section {
+    background: white;
+    padding: 32px;
+    border-radius: var(--radius-xl);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .component-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+  }
+
+  /* Using Design Tokens */
+  .btn-preview {
+    padding: calc(var(--spacing-unit) * 2.5) calc(var(--spacing-unit) * 6);
+    border-radius: var(--radius-full);
+    border: none;
+    background: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  .card-preview {
+    background: var(--md-sys-color-surface-variant);
+    color: var(--md-sys-color-on-surface-variant);
+    padding: calc(var(--spacing-unit) * 4) calc(var(--spacing-unit) * 4) calc(var(--spacing-unit) * 0) calc(var(--spacing-unit) * 4);
+    border-radius: var(--radius-l);
+    max-width: 300px;
+  }
+
+  input,
+  select,
+  textarea {
+    accent-color: var(--md-sys-color-primary);
+    padding: 8px 12px;
+    border-radius: var(--radius-xs);
+    border: 1px solid var(--md-sys-color-outline);
+  }
+
+  .highlight {
+    background-color: var(--md-sys-color-highlight);
+    color: var(--md-sys-color-on-highlight);
+    padding: 0 4px;
+    border-radius: 4px;
+  }
+
+  code-block {
+    display: block;
+    background: #333;
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    font-family: monospace;
+    white-space: pre-wrap;
+    font-size: 12px;
+    margin-top: 20px;
+  }
+
+  h4 {
+    margin-block-start: 0;
+    margin-block-end: 0;
+  }
+</style>
+<div class="showcase-section">
+  <h4>Code Language Switcher</h4>
+
+  <div class="component-row" id="language-selector-buttons">
+    <button class="primary-btn btn-preview lang-btn active" data-lang="cpp">C++</button>
+    <button class="primary-btn btn-preview lang-btn" data-lang="csharp">C#</button>
+    <button class="primary-btn btn-preview lang-btn" data-lang="typescript">TypeScript</button>
+  </div>
+
+  <div class="control-group">
+    <textarea id="code-box" rows="10"
+      style="width: 100%; font-family: monospace; font-size: 14px; background: #2d2d2d; color: #f8f8f2; border-radius: var(--radius-m); padding: calc(var(--spacing-unit) * 4); box-sizing: border-box; resize: vertical;"
+      spellcheck="false"></textarea>
+  </div>
+</div>
+
+<script>
+  (function () {
+    // 1. Dictionary containing your code snippets
+    const snippets = {
+      cpp: `#include <iostream>\n\nint main() {\n    std::cout << "Hello, C++ World!" << std::endl;\n    return 0;\n}`,
+      csharp: `using System;\n\nclass Program {\n    static void Main() {\n        Console.WriteLine("Hello, C# World!");\n    }\n}`,
+      typescript: `const greet = (name: string): string => {\n    return \`Hello, \${name}!\`;\n};\n\nconsole.log(greet("TypeScript"));`
+    };
+
+    // 2. Select DOM elements
+    const codeBox = document.getElementById('code-box');
+    const buttons = document.querySelectorAll('.lang-btn');
+
+    // 3. Keep track of user changes per language (Optional nice-to-have functionality)
+    // If the user edits the C++ snippet and switches back, their changes remain.
+    let currentLang = 'cpp';
+
+    // 4. Initialize default text box state
+    codeBox.value = snippets[currentLang];
+
+    // 5. Add click event listeners to all buttons
+    buttons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        // Save any current changes user made to the snippet dictionary before switching
+        snippets[currentLang] = codeBox.value;
+
+        // Manage active button visuals
+        buttons.forEach(btn => {
+          btn.style.opacity = '0.6'; // Dim inactive items using inline style variations
+          btn.style.outline = 'none';
+        });
+
+        // Highlight active button
+        e.currentTarget.style.opacity = '1';
+        e.currentTarget.style.outline = '2px solid var(--md-sys-color-primary, #333)';
+
+        // Update current language and fill textarea
+        currentLang = e.currentTarget.getAttribute('data-lang');
+        codeBox.value = snippets[currentLang];
+      });
+    });
+
+    // Run a quick styling sweep on initialization to match the logic
+    buttons.forEach(btn => {
+      if (!btn.classList.contains('active')) {
+        btn.style.opacity = '0.6';
+      } else {
+        btn.style.outline = '2px solid var(--md-sys-color-primary, #333)';
+      }
+    });
+  })();
+</script>
