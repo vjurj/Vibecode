@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OSR Spell List Manager</title>
+  <style>
+    :root {
+      /* Core Tones */
+      --md-sys-color-primary: hsl(100, 15%, 30%);
+      --md-sys-color-on-primary: hsl(100, 15%, 98%);
+      --md-sys-color-primary-container: hsl(100, 15%, 90%);
+
+      --md-sys-color-secondary: hsl(130, 10%, 40%);
+      --md-sys-color-on-secondary: #ffffff;
+
+      --md-sys-color-surface: hsl(100, 5%, 98%);
+      --md-sys-color-on-surface: hsl(100, 5%, 10%);
+      --md-sys-color-surface-variant: hsl(100, 10%, 90%);
+      --md-sys-color-on-surface-variant: hsl(100, 10%, 20%);
+
+      --md-sys-color-outline: hsl(100, 10%, 50%);
+
+      /* Highlight Tones (Muted/Pastel) */
+      --md-sys-color-highlight: hsl(280, 40%, 85%);
+      --md-sys-color-on-highlight: hsl(280, 40%, 20%);
+
+      /* Spacing (MD3 Expressive) */
+      --spacing-unit: 4px;
+      --radius-xs: 4px;
+      --radius-s: 8px;
+      --radius-m: 12px;
+      --radius-l: 16px;
+      --radius-xl: 28px;
+      --radius-full: 9999px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    body {
+      background-color: var(--md-sys-color-surface);
+      color: var(--md-sys-color-on-surface);
+      padding: calc(var(--spacing-unit) * 4);
+      line-height: 1.5;
+    }
+
+    header {
+      margin-bottom: calc(var(--spacing-unit) * 6);
+      border-bottom: 1px solid var(--md-sys-color-surface-variant);
+      padding-bottom: calc(var(--spacing-unit) * 4);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: calc(var(--spacing-unit) * 4);
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      color: var(--md-sys-color-primary);
+      font-weight: 700;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: calc(var(--spacing-unit) * 6);
+    }
+
+    @media (min-width: 1024px) {
+      .container {
+        grid-template-columns: 3fr 2fr;
+      }
+    }
+
+    /* Card Component Styling */
+    .card {
+      background-color: var(--md-sys-color-surface-variant);
+      border-radius: var(--radius-l);
+      padding: calc(var(--spacing-unit) * 4);
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--spacing-unit) * 4);
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface-variant);
+      margin-bottom: calc(var(--spacing-unit) * 2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Controls & Selectors */
+    .filter-group {
+      display: flex;
+      gap: calc(var(--spacing-unit) * 2);
+      flex-wrap: wrap;
+    }
+
+    select {
+      padding: calc(var(--spacing-unit) * 2.5) calc(var(--spacing-unit) * 4);
+      border-radius: var(--radius-s);
+      border: 1px solid var(--md-sys-color-outline);
+      background-color: var(--md-sys-color-surface);
+      color: var(--md-sys-color-on-surface);
+      font-size: 0.9rem;
+      cursor: pointer;
+      outline: none;
+      min-width: 140px;
+    }
+
+    select:focus {
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 2px var(--md-sys-color-primary-container);
+    }
+
+    /* Buttons */
+    .btn {
+      padding: calc(var(--spacing-unit) * 2.5) calc(var(--spacing-unit) * 4);
+      border-radius: var(--radius-full);
+      border: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+      display: inline-flex;
+      align-items: center;
+      gap: calc(var(--spacing-unit) * 2);
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background-color: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+    }
+
+    .btn-primary:hover {
+      background-color: hsl(100, 15%, 25%);
+    }
+
+    .btn-secondary {
+      background-color: var(--md-sys-color-secondary);
+      color: var(--md-sys-color-on-secondary);
+    }
+
+    .btn-secondary:hover {
+      background-color: hsl(130, 10%, 35%);
+    }
+
+    .btn-sm {
+      padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 3);
+      font-size: 0.8rem;
+      border-radius: var(--radius-s);
+    }
+
+    /* Lists and Grid Items */
+    .spell-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: calc(var(--spacing-unit) * 3);
+    }
+
+    @media (min-width: 640px) {
+      .spell-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      }
+    }
+
+    .spell-card {
+      background-color: var(--md-sys-color-surface);
+      border: 1px solid transparent;
+      border-radius: var(--radius-m);
+      padding: calc(var(--spacing-unit) * 3);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: calc(var(--spacing-unit) * 2);
+      transition: border-color 0.2s;
+    }
+
+    .spell-card:hover {
+      border-color: var(--md-sys-color-outline);
+    }
+
+    .spell-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: var(--spacing-unit);
+    }
+
+    .spell-name {
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface);
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      padding: calc(var(--spacing-unit) * 0.5) calc(var(--spacing-unit) * 1.5);
+      border-radius: var(--radius-xs);
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .badge-level {
+      background-color: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-primary);
+    }
+
+    .badge-class {
+      background-color: var(--md-sys-color-highlight);
+      color: var(--md-sys-color-on-highlight);
+    }
+
+    .spell-details {
+      font-size: 0.85rem;
+      color: var(--md-sys-color-on-surface-variant);
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Selected Spell Book / Sidebar List */
+    .selected-list {
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--spacing-unit) * 2);
+      max-height: 500px;
+      overflow-y: auto;
+      padding-right: calc(var(--spacing-unit) * 1);
+    }
+
+    .selected-item {
+      background-color: var(--md-sys-color-surface);
+      padding: calc(var(--spacing-unit) * 2.5) calc(var(--spacing-unit) * 3);
+      border-radius: var(--radius-s);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: calc(var(--spacing-unit) * 2);
+    }
+
+    .selected-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .selected-name {
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    .selected-meta {
+      font-size: 0.75rem;
+      color: var(--md-sys-color-outline);
+    }
+
+    .btn-remove {
+      background: none;
+      border: none;
+      color: hsl(0, 70%, 50%);
+      font-weight: bold;
+      cursor: pointer;
+      padding: calc(var(--spacing-unit) * 1);
+      font-size: 1.1rem;
+    }
+
+    .btn-remove:hover {
+      color: hsl(0, 80%, 40%);
+    }
+
+    .empty-state {
+      text-align: center;
+      color: var(--md-sys-color-outline);
+      padding: calc(var(--spacing-unit) * 8) 0;
+      font-style: italic;
+    }
+
+    /* Custom Scrollbar */
+    .selected-list::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .selected-list::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .selected-list::-webkit-scrollbar-thumb {
+      background: var(--md-sys-color-outline);
+      border-radius: var(--radius-full);
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div>
+      <h1>OSR Spell Compendium</h1>
+      <p style="color: var(--md-sys-color-outline); font-size: 0.9rem;">Select spells from classic OSR lists and export
+        your spellbook</p>
+    </div>
+    <button class="btn btn-secondary" id="btnExport">
+      Export Book (JSON)
+    </button>
+  </header>
+
+  <div class="container">
+    <main class="card">
+      <div class="card-title">
+        <span>Available Spells</span>
+        <div class="filter-group">
+          <select id="selectClass">
+            <option value="all">All Classes</option>
+            <option value="Magic-User">Magic-User</option>
+            <option value="Cleric">Cleric</option>
+          </select>
+          <select id="selectLevel">
+            <option value="all">All Levels</option>
+            <option value="1">Level 1</option>
+            <option value="2">Level 2</option>
+            <option value="3">Level 3</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="spell-grid" id="spellGrid">
+      </div>
+    </main>
+
+    <aside class="card">
+      <div class="card-title">
+        <span>Your Selected Spells</span>
+        <span id="selectionCount" class="badge badge-level">0 Selected</span>
+      </div>
+
+      <div class="selected-list" id="selectedList">
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    // Sample OSR Database (Classic BX style placeholder data)
+    const spellDatabase = [
+      { id: "mu1", class: "Magic-User", level: 1, name: "Charm Person", range: "120 feet", duration: "Special", description: "Brings a humanoid under the caster's influence if they fail a saving throw." },
+      { id: "mu2", class: "Magic-User", level: 1, name: "Detect Magic", range: "60 feet", duration: "2 turns", description: "Allows the caster to perceive magical energies radiating from objects or areas." },
+      { id: "mu3", class: "Magic-User", level: 1, name: "Magic Missile", range: "150 feet", duration: "Instantaneous", description: "Creates an unerring dart of magical energy dealing 1d6+1 damage." },
+      { id: "mu4", class: "Magic-User", level: 1, name: "Sleep", range: "240 feet", duration: "4 turns + 4/level", description: "Puts 2d8 Hit Dice of creatures into a magical slumber." },
+      { id: "mu5", class: "Magic-User", level: 2, name: "Invisibility", range: "Touch", duration: "Permanent until attacking", description: "Renders a creature completely invisible until they attack or cast a spell." },
+      { id: "mu6", class: "Magic-User", level: 2, name: "Web", range: "10 feet", duration: "2 turns", description: "Fills a 10-foot cube with sticky, structural threads that trap creatures." },
+      { id: "mu7", class: "Magic-User", level: 3, name: "Fireball", range: "240 feet", duration: "Instantaneous", description: "An explosion of flame dealing 1d6 damage per caster level to all within a 20-foot radius." },
+      { id: "mu8", class: "Magic-User", level: 3, name: "Fly", range: "Touch", duration: "1d6 turns + 1/level", description: "Grinds the subject the ability to fly through the air up to 120 feet per turn." },
+
+      { id: "cl1", class: "Cleric", level: 1, name: "Cure Light Wounds", range: "Touch", duration: "Instantaneous", description: "Heals a touched creature of 1d6+1 points of damage." },
+      { id: "cl2", class: "Cleric", level: 1, name: "Detect Evil", range: "120 feet", duration: "6 turns", description: "Discovers evil intentions or unholy objects within the line of sight." },
+      { id: "cl3", class: "Cleric", level: 1, name: "Purify Food and Water", range: "10 feet", duration: "Instantaneous", description: "Makes spoiled, rotten, or poisoned rations completely safe." },
+      { id: "cl4", class: "Cleric", level: 2, name: "Bless", range: "60 feet", duration: "6 turns", description: "Raises morale and gives +1 to hit rolls for allies not currently in melee." },
+      { id: "cl5", class: "Cleric", level: 2, name: "Hold Person", range: "180 feet", duration: "9 turns", description: "Paralyzes up to 1d4 targets who fail a saving throw vs. Spells." },
+      { id: "cl6", class: "Cleric", level: 3, name: "Cure Disease", range: "Touch", duration: "Instantaneous", description: "Immediately cures the target of any afflictions, curses, or physical diseases." }
+    ];
+
+    // Application State
+    let selectedSpellIds = new Set();
+
+    // DOM elements
+    const selectClass = document.getElementById('selectClass');
+    const selectLevel = document.getElementById('selectLevel');
+    const spellGrid = document.getElementById('spellGrid');
+    const selectedList = document.getElementById('selectedList');
+    const selectionCount = document.getElementById('selectionCount');
+    const btnExport = document.getElementById('btnExport');
+
+    // Render functions
+    function renderAvailableSpells() {
+      const classFilter = selectClass.value;
+      const levelFilter = selectLevel.value;
+
+      const filteredSpells = spellDatabase.filter(spell => {
+        const matchClass = classFilter === 'all' || spell.class === classFilter;
+        const matchLevel = levelFilter === 'all' || spell.level.toString() === levelFilter;
+        return matchClass && matchLevel;
+      });
+
+      if (filteredSpells.length === 0) {
+        spellGrid.innerHTML = `<div class="empty-state" style="grid-column: 1/-1;">No spells match your filters.</div>`;
+        return;
+      }
+
+      spellGrid.innerHTML = filteredSpells.map(spell => {
+        const isSelected = selectedSpellIds.has(spell.id);
+        return `
+                    <div class="spell-card">
+                        <div>
+                            <div class="spell-header">
+                                <span class="spell-name">${spell.name}</span>
+                                <div style="display:flex; gap:2px; flex-direction:column; align-items:flex-end;">
+                                    <span class="badge badge-class">${spell.class}</span>
+                                    <span class="badge badge-level">Lvl ${spell.level}</span>
+                                </div>
+                            </div>
+                            <p class="spell-details" title="${spell.description}">${spell.description}</p>
+                            <div style="font-size: 0.75rem; color: var(--md-sys-color-outline); margin-top: 4px;">
+                                <strong>R:</strong> ${spell.range} | <strong>D:</strong> ${spell.duration}
+                            </div>
+                        </div>
+                        <button 
+                            class="btn btn-sm ${isSelected ? 'btn-secondary' : 'btn-primary'}" 
+                            onclick="toggleSpell('${spell.id}')"
+                            style="margin-top: calc(var(--spacing-unit) * 2); width: 100%; justify-content: center;"
+                        >
+                            ${isSelected ? '✓ Selected' : 'Add to Book'}
+                        </button>
+                    </div>
+                `;
+      }).join('');
+    }
+
+    function renderSelectedSpells() {
+      selectionCount.textContent = `${selectedSpellIds.size} Selected`;
+
+      if (selectedSpellIds.size === 0) {
+        selectedList.innerHTML = `<div class="empty-state">No spells chosen yet. Browse the archive to select spells for your spellbook.</div>`;
+        return;
+      }
+
+      const chosenSpells = spellDatabase.filter(spell => selectedSpellIds.has(spell.id));
+
+      selectedList.innerHTML = chosenSpells.map(spell => `
+                <div class="selected-item">
+                    <div class="selected-info">
+                        <span class="selected-name">${spell.name}</span>
+                        <span class="selected-meta">${spell.class} — Level ${spell.level}</span>
+                    </div>
+                    <button class="btn-remove" onclick="toggleSpell('${spell.id}')" title="Remove spell">&times;</button>
+                </div>
+            `).join('');
+    }
+
+    // Action Handlers
+    window.toggleSpell = function (id) {
+      if (selectedSpellIds.has(id)) {
+        selectedSpellIds.delete(id);
+      } else {
+        selectedSpellIds.add(id);
+      }
+      renderAvailableSpells();
+      renderSelectedSpells();
+    };
+
+    btnExport.addEventListener('click', () => {
+      if (selectedSpellIds.size === 0) {
+        alert("Your spellbook is empty! Please add some spells before exporting.");
+        return;
+      }
+
+      const chosenSpells = spellDatabase.filter(spell => selectedSpellIds.has(spell.id));
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(chosenSpells, null, 2));
+
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "osr_spellbook.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    });
+
+    // Filters Event Listeners
+    selectClass.addEventListener('change', renderAvailableSpells);
+    selectLevel.addEventListener('change', renderAvailableSpells);
+
+    // Initial setup
+    renderAvailableSpells();
+    renderSelectedSpells();
+  </script>
+</body>
+
+</html>

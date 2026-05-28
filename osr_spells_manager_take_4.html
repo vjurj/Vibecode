@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OSR Compendium & Vault Builder</title>
+  <style>
+    :root {
+      /* Core Tones */
+      --md-sys-color-primary: hsl(100, 15%, 30%);
+      --md-sys-color-on-primary: hsl(100, 15%, 98%);
+      --md-sys-color-primary-container: hsl(100, 15%, 90%);
+
+      --md-sys-color-secondary: hsl(130, 10%, 40%);
+      --md-sys-color-on-secondary: #ffffff;
+
+      --md-sys-color-surface: hsl(100, 5%, 98%);
+      --md-sys-color-on-surface: hsl(100, 5%, 10%);
+      --md-sys-color-surface-variant: hsl(100, 10%, 90%);
+      --md-sys-color-on-surface-variant: hsl(100, 10%, 20%);
+
+      --md-sys-color-outline: hsl(100, 10%, 50%);
+
+      /* Highlight Tones (Muted/Pastel) */
+      --md-sys-color-highlight: hsl(280, 40%, 85%);
+      --md-sys-color-on-highlight: hsl(280, 40%, 20%);
+
+      /* Item/Rarity specific colors */
+      --color-rarity-common: hsl(100, 10%, 40%);
+      --color-rarity-magic: hsl(210, 50%, 45%);
+      --color-rarity-artifact: hsl(35, 75%, 45%);
+
+      /* Spacing (MD3 Expressive) */
+      --spacing-unit: 4px;
+      --radius-xs: 4px;
+      --radius-s: 8px;
+      --radius-m: 12px;
+      --radius-l: 16px;
+      --radius-xl: 28px;
+      --radius-full: 9999px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    body {
+      background-color: var(--md-sys-color-surface);
+      color: var(--md-sys-color-on-surface);
+      padding: calc(var(--spacing-unit) * 4);
+      line-height: 1.5;
+    }
+
+    header {
+      margin-bottom: calc(var(--spacing-unit) * 4);
+      border-bottom: 1px solid var(--md-sys-color-surface-variant);
+      padding-bottom: calc(var(--spacing-unit) * 4);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: calc(var(--spacing-unit) * 4);
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      color: var(--md-sys-color-primary);
+      font-weight: 700;
+    }
+
+    /* Mode Switcher Layout Container */
+    .workspace-selector {
+      display: flex;
+      gap: calc(var(--spacing-unit) * 2);
+      margin-bottom: calc(var(--spacing-unit) * 4);
+      background: var(--md-sys-color-surface-variant);
+      padding: calc(var(--spacing-unit) * 1.5);
+      border-radius: var(--radius-m);
+      align-self: center;
+    }
+
+    .mode-btn {
+      background: none;
+      border: none;
+      padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 5);
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      border-radius: var(--radius-s);
+      color: var(--md-sys-color-on-surface-variant);
+      transition: all 0.2s;
+    }
+
+    .mode-btn.active {
+      background-color: var(--md-sys-color-surface);
+      color: var(--md-sys-color-primary);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    }
+
+    .main-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: calc(var(--spacing-unit) * 6);
+      align-items: start;
+    }
+
+    @media (min-width: 1024px) {
+      .main-layout {
+        grid-template-columns: 3fr 2fr;
+      }
+    }
+
+    .left-column {
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--spacing-unit) * 6);
+    }
+
+    /* Card Component Styling */
+    .card {
+      background-color: var(--md-sys-color-surface-variant);
+      border-radius: var(--radius-l);
+      padding: calc(var(--spacing-unit) * 4);
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--spacing-unit) * 4);
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface-variant);
+      margin-bottom: calc(var(--spacing-unit) * 2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: calc(var(--spacing-unit) * 2);
+    }
+
+    /* Controls & Form Elements */
+    .filter-group {
+      display: flex;
+      gap: calc(var(--spacing-unit) * 2);
+      flex-wrap: wrap;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: calc(var(--spacing-unit) * 3);
+    }
+
+    @media (min-width: 640px) {
+      .form-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .form-span-full {
+        grid-column: span 3;
+      }
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-unit);
+    }
+
+    .form-field label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    select,
+    input,
+    textarea {
+      padding: calc(var(--spacing-unit) * 2.5) calc(var(--spacing-unit) * 4);
+      border-radius: var(--radius-s);
+      border: 1px solid var(--md-sys-color-outline);
+      background-color: var(--md-sys-color-surface);
+      color: var(--md-sys-color-on-surface);
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    select:focus,
+    input:focus,
+    textarea:focus {
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 2px var(--md-sys-color-primary-container);
+    }
+
+    /* Buttons */
+    .btn {
+      padding: calc(var(--spacing-unit) * 2.5) calc(var(--spacing-unit) * 4);
+      border-radius: var(--radius-full);
+      border: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: calc(var(--spacing-unit) * 2);
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background-color: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+    }
+
+    .btn-primary:hover {
+      background-color: hsl(100, 15%, 25%);
+    }
+
+    .btn-secondary {
+      background-color: var(--md-sys-color-secondary);
+      color: var(--md-sys-color-on-secondary);
+    }
+
+    .btn-secondary:hover {
+      background-color: hsl(130, 10%, 35%);
+    }
+
+    .btn-sm {
+      padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 3);
+      font-size: 0.8rem;
+      border-radius: var(--radius-s);
+    }
+
+    /* Lists and Grid Items */
+    .catalog-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: calc(var(--spacing-unit) * 3);
+    }
+
+    @media (min-width: 640px) {
+      .catalog-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      }
+    }
+
+    .catalog-item-card {
+      background-color: var(--md-sys-color-surface);
+      border: 1px solid transparent;
+      border-radius: var(--radius-m);
+      padding: calc(var(--spacing-unit) * 3);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: calc(var(--spacing-unit) * 2);
+      transition: border-color 0.2s;
+    }
+
+    .catalog-item-card:hover {
+      border-color: var(--md-sys-color-outline);
+    }
+
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: var(--spacing-unit);
+    }
+
+    .item-title-text {
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface);
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      padding: calc(var(--spacing-unit) * 0.5) calc(var(--spacing-unit) * 1.5);
+      border-radius: var(--radius-xs);
+      font-weight: bold;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .badge-level {
+      background-color: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-primary);
+    }
+
+    .badge-class {
+      background-color: var(--md-sys-color-highlight);
+      color: var(--md-sys-color-on-highlight);
+    }
+
+    .badge-homebrew {
+      background-color: hsl(30, 80%, 85%);
+      color: hsl(30, 80%, 20%);
+    }
+
+    .badge-common {
+      background-color: #eee;
+      color: #333;
+    }
+
+    .badge-magic {
+      background-color: #dbeafe;
+      color: #1e40af;
+    }
+
+    .badge-artifact {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+
+    .item-body-details {
+      font-size: 0.85rem;
+      color: var(--md-sys-color-on-surface-variant);
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-top: calc(var(--spacing-unit) * 1);
+    }
+
+    /* Selected Book / Workspace Sidebar List */
+    .selected-list {
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--spacing-unit) * 2);
+      max-height: 720px;
+      overflow-y: auto;
+      padding-right: calc(var(--spacing-unit) * 1);
+    }
+
+    .selected-item {
+      background-color: var(--md-sys-color-surface);
+      padding: calc(var(--spacing-unit) * 2.5) calc(var(--spacing-unit) * 3);
+      border-radius: var(--radius-s);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: calc(var(--spacing-unit) * 2);
+    }
+
+    .selected-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .selected-name {
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    .selected-meta {
+      font-size: 0.75rem;
+      color: var(--md-sys-color-outline);
+    }
+
+    .btn-remove {
+      background: none;
+      border: none;
+      color: hsl(0, 70%, 50%);
+      font-weight: bold;
+      cursor: pointer;
+      padding: calc(var(--spacing-unit) * 1);
+      font-size: 1.1rem;
+    }
+
+    .btn-remove:hover {
+      color: hsl(0, 80%, 40%);
+    }
+
+    .empty-state {
+      text-align: center;
+      color: var(--md-sys-color-outline);
+      padding: calc(var(--spacing-unit) * 8) 0;
+      font-style: italic;
+    }
+
+    /* Modal / Dialog Layout overlay */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: calc(var(--spacing-unit) * 4);
+    }
+
+    .modal-container {
+      background-color: var(--md-sys-color-surface);
+      color: var(--md-sys-color-on-surface);
+      max-width: 950px;
+      width: 100%;
+      max-height: 90vh;
+      border-radius: var(--radius-xl);
+      padding: calc(var(--spacing-unit) * 6);
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--spacing-unit) * 4);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .tab-bar {
+      display: flex;
+      gap: calc(var(--spacing-unit) * 2);
+      border-bottom: 2px solid var(--md-sys-color-surface-variant);
+      padding-bottom: calc(var(--spacing-unit) * 2);
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 4);
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--md-sys-color-outline);
+      border-radius: var(--radius-s);
+    }
+
+    .tab-btn.active {
+      color: var(--md-sys-color-primary);
+      background-color: var(--md-sys-color-primary-container);
+    }
+
+    /* Split Workspace Area */
+    .workspace-split {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: calc(var(--spacing-unit) * 4);
+      flex-grow: 1;
+      min-height: 0;
+    }
+
+    @media (min-width: 768px) {
+      .workspace-split {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .panel-container {
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--spacing-unit) * 1.5);
+      min-height: 0;
+    }
+
+    .panel-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--md-sys-color-outline);
+    }
+
+    .preview-box {
+      background-color: #1e1e1e;
+      color: #d4d4d4;
+      padding: calc(var(--spacing-unit) * 4);
+      border-radius: var(--radius-m);
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.85rem;
+      overflow: auto;
+      white-space: pre-wrap;
+      border: 1px solid var(--md-sys-color-outline);
+      flex-grow: 1;
+    }
+
+    .visual-display-panel {
+      background-color: var(--md-sys-color-surface-variant);
+      padding: calc(var(--spacing-unit) * 4);
+      border-radius: var(--radius-m);
+      overflow-y: auto;
+      border: 1px dashed var(--md-sys-color-outline);
+      flex-grow: 1;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Custom Scrollbar for layouts */
+    .selected-list::-webkit-scrollbar,
+    .preview-box::-webkit-scrollbar,
+    .visual-display-panel::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    .selected-list::-webkit-scrollbar-track,
+    .preview-box::-webkit-scrollbar-track,
+    .visual-display-panel::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .selected-list::-webkit-scrollbar-thumb,
+    .preview-box::-webkit-scrollbar-thumb,
+    .visual-display-panel::-webkit-scrollbar-thumb {
+      background: var(--md-sys-color-outline);
+      border-radius: var(--radius-full);
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div>
+      <h1>OSR Campaign Module Architect</h1>
+      <p style="color: var(--md-sys-color-outline); font-size: 0.9rem;">Generate multi-format structural outputs for
+        custom spellbooks and item vaults.</p>
+    </div>
+
+    <div class="workspace-selector">
+      <button class="mode-btn active" id="modeSpells" onclick="switchAppMode('spells')">Spell Compendium</button>
+      <button class="mode-btn" id="modeItems" onclick="switchAppMode('items')">Equipment Vault</button>
+    </div>
+
+    <button class="btn btn-secondary" id="btnOpenExport">
+      Open Export Center
+    </button>
+  </header>
+
+  <div class="main-layout">
+    <!-- Left Side Dynamic Column Configurations -->
+    <div class="left-column">
+
+      <!-- FORM 1: SPELL CREATOR -->
+      <section class="card" id="spellFormWrapper">
+        <h2 class="card-title">Forge Custom Homebrew Spell</h2>
+        <form id="homebrewSpellForm" class="form-grid">
+          <div class="form-field">
+            <label for="spellName">Spell Name</label>
+            <input type="text" id="spellName" placeholder="e.g., Fireball" required>
+          </div>
+          <div class="form-field">
+            <label for="spellClass">Class Association</label>
+            <select id="spellClass">
+              <option value="Magic-User">Magic-User</option>
+              <option value="Cleric">Cleric</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="spellLevel">Spell Level</label>
+            <select id="spellLevel">
+              <option value="1">Level 1</option>
+              <option value="2">Level 2</option>
+              <option value="3">Level 3</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="spellRange">Range</label>
+            <input type="text" id="spellRange" placeholder="60 feet" required>
+          </div>
+          <div class="form-field">
+            <label for="spellDuration">Duration</label>
+            <input type="text" id="spellDuration" placeholder="Instantaneous" required>
+          </div>
+          <div class="form-field">
+            <label>&nbsp;</label>
+            <button type="submit" class="btn btn-primary" style="border-radius: var(--radius-s)">
+              + Add Spell
+            </button>
+          </div>
+          <div class="form-field form-span-full">
+            <label for="spellDesc">Spell Effects / Description</label>
+            <textarea id="spellDesc" placeholder="Describe mechanical parameters..." required></textarea>
+          </div>
+        </form>
+      </section>
+
+      <!-- FORM 2: EQUIPMENT / MAGIC ITEM VAULT CREATOR -->
+      <section class="card hidden" id="itemFormWrapper">
+        <h2 class="card-title">Forge Equipment & Magic Items</h2>
+        <form id="homebrewItemForm" class="form-grid">
+          <div class="form-field">
+            <label for="itemName">Item Name</label>
+            <input type="text" id="itemName" placeholder="e.g., Sun Blade" required>
+          </div>
+          <div class="form-field">
+            <label for="itemType">Item Category</label>
+            <select id="itemType">
+              <option value="Weapon">Weapon</option>
+              <option value="Armor">Armor/Shield</option>
+              <option value="Wondrous">Wondrous Item</option>
+              <option value="Gear">Adventuring Gear</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="itemRarity">Classification / Rarity</label>
+            <select id="itemRarity">
+              <option value="common">Standard Equipment</option>
+              <option value="magic">Minor Magic Item</option>
+              <option value="artifact">Major Artifact</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="itemWeight">Bulk / Weight</label>
+            <input type="text" id="itemWeight" placeholder="e.g., 2 slots or 5 lbs" required>
+          </div>
+          <div class="form-field">
+            <label for="itemValue">Cost / Value</label>
+            <input type="text" id="itemValue" placeholder="e.g., 400 gp" required>
+          </div>
+          <div class="form-field">
+            <label>&nbsp;</label>
+            <button type="submit" class="btn btn-secondary" style="border-radius: var(--radius-s)">
+              + Forge Item
+            </button>
+          </div>
+          <div class="form-field form-span-full">
+            <label for="itemDesc">Properties & Attunement Rules</label>
+            <textarea id="itemDesc"
+              placeholder="Describe the item's properties, damage dice, armor modifiers, or narrative quirks..."
+              required></textarea>
+          </div>
+        </form>
+      </section>
+
+      <!-- Dynamic Browser Panel Grid Workspace -->
+      <main class="card">
+        <div class="card-title">
+          <span id="browserPanelTitle">Available Spells</span>
+
+          <!-- Filters Section for Spells -->
+          <div class="filter-group" id="spellFilters">
+            <select id="filterClass">
+              <option value="all">All Classes</option>
+              <option value="Magic-User">Magic-User</option>
+              <option value="Cleric">Cleric</option>
+            </select>
+            <select id="filterLevel">
+              <option value="all">All Levels</option>
+              <option value="1">Level 1</option>
+              <option value="2">Level 2</option>
+              <option value="3">Level 3</option>
+            </select>
+          </div>
+
+          <!-- Filters Section for Items -->
+          <div class="filter-group hidden" id="itemFilters">
+            <select id="filterItemType">
+              <option value="all">All Categories</option>
+              <option value="Weapon">Weapons</option>
+              <option value="Armor">Armor</option>
+              <option value="Wondrous">Wondrous</option>
+              <option value="Gear">Gear</option>
+            </select>
+            <select id="filterRarity">
+              <option value="all">All Rarities</option>
+              <option value="common">Standard</option>
+              <option value="magic">Minor Magic</option>
+              <option value="artifact">Artifact</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="catalog-grid" id="catalogGrid">
+          <!-- Cards injection framework dynamically loaded here -->
+        </div>
+      </main>
+    </div>
+
+    <!-- Right Side Sidebar Configurations: Displays Active Selections -->
+    <aside class="card">
+      <div class="card-title">
+        <span id="sidebarPanelTitle">Selected Spells</span>
+        <span id="selectionCount" class="badge badge-level">0 Selected</span>
+      </div>
+
+      <div class="selected-list" id="selectedList">
+        <!-- Selected targets render view dynamic interface -->
+      </div>
+    </aside>
+  </div>
+
+  <!-- Multi-Format Code Export Center Modal Interface Workspace Frame -->
+  <div class="modal-overlay" id="exportModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h2 style="color: var(--md-sys-color-primary);" id="modalMainTitle">Multi-Format Export Hub</h2>
+        <button class="btn-remove" id="btnCloseModal" style="font-size:1.75rem;">&times;</button>
+      </div>
+
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchExportTab('json')">Raw JSON</button>
+        <button class="tab-btn" onclick="switchExportTab('markdown')">Wiki Markdown</button>
+        <button class="tab-btn" onclick="switchExportTab('html')">HTML Cards block</button>
+      </div>
+
+      <!-- Double-pane workspace section layout -->
+      <div class="workspace-split">
+        <div class="panel-container">
+          <span class="panel-label">Source Output Code</span>
+          <div class="preview-box" id="exportPreview"></div>
+        </div>
+        <div class="panel-container">
+          <span class="panel-label" id="visualPanelLabel">Live Dynamic Render</span>
+          <div class="visual-display-panel" id="visualPreview"></div>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: calc(var(--spacing-unit)*3);">
+        <button class="btn btn-secondary" id="btnCopyClipboard">Copy Code</button>
+        <button class="btn btn-primary" id="btnDownloadFile">Download File</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Core Structured Data Stores
+    let activeAppMode = 'spells'; // Tracking context: 'spells' | 'items'
+    let currentActiveTab = 'json'; // Export format context: 'json' | 'markdown' | 'html'
+
+    let selectedSpellIds = new Set();
+    let selectedItemIds = new Set();
+
+    const spellDatabase = [
+      { id: "mu1", class: "Magic-User", level: 1, name: "Charm Person", range: "120 feet", duration: "Special", description: "Brings a humanoid under influence if saving throw fails.", source: "core" },
+      { id: "mu3", class: "Magic-User", level: 1, name: "Magic Missile", range: "150 feet", duration: "Instantaneous", description: "Creates an unerring dart of magical energy dealing 1d6+1 damage.", source: "core" },
+      { id: "mu7", class: "Magic-User", level: 3, name: "Fireball", range: "240 feet", duration: "Instantaneous", description: "Explosion of flame dealing 1d6 damage per caster level to a 20-foot radius.", source: "core" },
+      { id: "cl1", class: "Cleric", level: 1, name: "Cure Light Wounds", range: "Touch", duration: "Instantaneous", description: "Heals a touched creature of 1d6+1 points of damage.", source: "core" }
+    ];
+
+    const itemDatabase = [
+      { id: "it1", type: "Weapon", rarity: "common", name: "Longsword", weight: "4 lbs", value: "15 gp", description: "Standard reliable double-edged infantry blade. Deals 1d8 slashing damage.", source: "core" },
+      { id: "it2", type: "Armor", rarity: "common", name: "Chainmail Suite", weight: "40 lbs", value: "40 gp", description: "Provides basic reliable standard defense. Base AC 5 [14].", source: "core" },
+      { id: "it3", type: "Wondrous", rarity: "magic", name: "Bag of Holding", weight: "5 lbs", value: "1500 gp", description: "Interior opens into non-dimensional space. Can store up to 1000 lbs.", source: "core" },
+      { id: "it4", type: "Weapon", rarity: "artifact", name: "The Sun Blade", weight: "2 lbs", value: "Priceless", description: "An ancient hilt that projects a blade of pure solar radiation. +3 to hit; deals double damage vs Undead hosts.", source: "core" }
+    ];
+
+    // Global Target Nodes Lookup Cache
+    const catalogGrid = document.getElementById('catalogGrid');
+    const selectedList = document.getElementById('selectedList');
+    const selectionCount = document.getElementById('selectionCount');
+
+    // Dynamic visibility layers
+    const spellFormWrapper = document.getElementById('spellFormWrapper');
+    const itemFormWrapper = document.getElementById('itemFormWrapper');
+    const spellFilters = document.getElementById('spellFilters');
+    const itemFilters = document.getElementById('itemFilters');
+    const browserPanelTitle = document.getElementById('browserPanelTitle');
+    const sidebarPanelTitle = document.getElementById('sidebarPanelTitle');
+
+    // Modal Component Target Targets
+    const exportModal = document.getElementById('exportModal');
+    const btnOpenExport = document.getElementById('btnOpenExport');
+    const btnCloseModal = document.getElementById('btnCloseModal');
+    const exportPreview = document.getElementById('exportPreview');
+    const visualPreview = document.getElementById('visualPreview');
+    const visualPanelLabel = document.getElementById('visualPanelLabel');
+    const btnCopyClipboard = document.getElementById('btnCopyClipboard');
+    const btnDownloadFile = document.getElementById('btnDownloadFile');
+
+    // Application Mode Switch Controller
+    window.switchAppMode = function (mode) {
+      activeAppMode = mode;
+      document.getElementById('modeSpells').classList.toggle('active', mode === 'spells');
+      document.getElementById('modeItems').classList.toggle('active', mode === 'items');
+
+      if (mode === 'spells') {
+        spellFormWrapper.classList.remove('hidden');
+        spellFilters.classList.remove('hidden');
+        browserPanelTitle.textContent = "Available Spells Archive";
+        sidebarPanelTitle.textContent = "Your Selected Spells";
+        itemFormWrapper.classList.add('hidden');
+        itemFilters.classList.add('hidden');
+      } else {
+        itemFormWrapper.classList.remove('hidden');
+        itemFilters.classList.remove('hidden');
+        browserPanelTitle.textContent = "Vault Equipment Index";
+        sidebarPanelTitle.textContent = "Vault Storage Inventory";
+        spellFormWrapper.classList.add('hidden');
+        spellFilters.classList.add('hidden');
+      }
+      renderMasterCatalogGrid();
+      renderSidebarSelectedList();
+    };
+
+    // Render Controller: Engine Switch Grid Dispatcher 
+    function renderMasterCatalogGrid() {
+      if (activeAppMode === 'spells') {
+        renderSpellsEngine();
+      } else {
+        renderItemsEngine();
+      }
+    }
+
+    // Child Engine Room: Spells Card Rendering
+    function renderSpellsEngine() {
+      const classF = document.getElementById('filterClass').value;
+      const levelF = document.getElementById('filterLevel').value;
+
+      const list = spellDatabase.filter(s => {
+        return (classF === 'all' || s.class === classF) && (levelF === 'all' || s.level.toString() === levelF);
+      });
+
+      if (!list.length) {
+        catalogGrid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">No spell matches this configuration.</div>`;
+        return;
+      }
+
+      catalogGrid.innerHTML = list.map(spell => {
+        const checked = selectedSpellIds.has(spell.id);
+        return `
+                    <div class="catalog-item-card" style="${spell.source === 'homebrew' ? 'border-left: 4px solid hsl(30, 80%, 50%)' : ''}">
+                        <div>
+                            <div class="item-header">
+                                <span class="item-title-text">${spell.name}</span>
+                                <div style="display:flex; gap:2px; flex-direction:column; align-items:flex-end;">
+                                    <span class="badge badge-class">${spell.class}</span>
+                                    <span class="badge badge-level">Lvl ${spell.level}</span>
+                                </div>
+                            </div>
+                            <p class="item-body-details" title="${spell.description}">${spell.description}</p>
+                            <div style="font-size: 0.75rem; color: var(--md-sys-color-outline); margin-top: 6px;">
+                                <strong>Range:</strong> ${spell.range} | <strong>Duration:</strong> ${spell.duration}
+                            </div>
+                        </div>
+                        <button class="btn btn-sm ${checked ? 'btn-secondary' : 'btn-primary'}" onclick="toggleSelection('${spell.id}')" style="margin-top:12px; width:100%;">
+                            ${checked ? '✓ Selected' : 'Add to Book'}
+                        </button>
+                    </div>
+                `;
+      }).join('');
+    }
+
+    // Child Engine Room: Equipment Card Rendering
+    function renderItemsEngine() {
+      const typeF = document.getElementById('filterItemType').value;
+      const rarityF = document.getElementById('filterRarity').value;
+
+      const list = itemDatabase.filter(i => {
+        return (typeF === 'all' || i.type === typeF) && (rarityF === 'all' || i.rarity === rarityF);
+      });
+
+      if (!list.length) {
+        catalogGrid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">No equipment assets found matching filters.</div>`;
+        return;
+      }
+
+      catalogGrid.innerHTML = list.map(item => {
+        const checked = selectedItemIds.has(item.id);
+        return `
+                    <div class="catalog-item-card" style="border-top: 3px solid var(--color-rarity-${item.rarity})">
+                        <div>
+                            <div class="item-header">
+                                <span class="item-title-text">${item.name}</span>
+                                <span class="badge badge-${item.rarity}">${item.rarity}</span>
+                            </div>
+                            <div style="font-size:0.75rem; color:var(--md-sys-color-outline); font-weight:bold; margin-top: -2px;">
+                                ${item.type}
+                            </div>
+                            <p class="item-body-details" title="${item.description}">${item.description}</p>
+                            <div style="font-size: 0.75rem; color: var(--md-sys-color-outline); margin-top: 6px;">
+                                <strong>Weight:</strong> ${item.weight} | <strong>Value:</strong> ${item.value}
+                            </div>
+                        </div>
+                        <button class="btn btn-sm ${checked ? 'btn-secondary' : 'btn-primary'}" onclick="toggleSelection('${item.id}')" style="margin-top:12px; width:100%;">
+                            ${checked ? '✓ Packaged' : 'Add to Vault'}
+                        </button>
+                    </div>
+                `;
+      }).join('');
+    }
+
+    // Selection Sync Manager
+    window.toggleSelection = function (id) {
+      const pool = (id.startsWith('mu') || id.startsWith('cl') || id.startsWith('cust_sp')) ? selectedSpellIds : selectedItemIds;
+      if (pool.has(id)) { pool.delete(id); } else { pool.add(id); }
+
+      renderMasterCatalogGrid();
+      renderSidebarSelectedList();
+
+      if (exportModal.style.display === 'flex') {
+        exportPreview.textContent = generateActiveExportPayload(currentActiveTab);
+        refreshLiveVisualPreview();
+      }
+    };
+
+    // Sidebar Synchronized Assembly View
+    function renderSidebarSelectedList() {
+      if (activeAppMode === 'spells') {
+        selectionCount.textContent = `${selectedSpellIds.size} Spells`;
+        if (!selectedSpellIds.size) {
+          selectedList.innerHTML = `<div class="empty-state">No spells collected.</div>`;
+          return;
+        }
+        const items = spellDatabase.filter(s => selectedSpellIds.has(s.id));
+        selectedList.innerHTML = items.map(s => `
+                    <div class="selected-item">
+                        <div class="selected-info">
+                            <span class="selected-name">${s.name}</span>
+                            <span class="selected-meta">${s.class} (Lvl ${s.level})</span>
+                        </div>
+                        <button class="btn-remove" onclick="toggleSelection('${s.id}')">&times;</button>
+                    </div>
+                `).join('');
+      } else {
+        selectionCount.textContent = `${selectedItemIds.size} Items`;
+        if (!selectedItemIds.size) {
+          selectedList.innerHTML = `<div class="empty-state">Inventory vault empty.</div>`;
+          return;
+        }
+        const items = itemDatabase.filter(i => selectedItemIds.has(i.id));
+        selectedList.innerHTML = items.map(i => `
+                    <div class="selected-item">
+                        <div class="selected-info">
+                            <span class="selected-name">${i.name}</span>
+                            <span class="selected-meta">${i.type} (${i.weight})</span>
+                        </div>
+                        <button class="btn-remove" onclick="toggleSelection('${i.id}')">&times;</button>
+                    </div>
+                `).join('');
+      }
+    }
+
+    // Dynamic Form Processing Systems
+    document.getElementById('homebrewSpellForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const id = 'cust_sp_' + Date.now();
+      spellDatabase.unshift({
+        id,
+        name: document.getElementById('spellName').value,
+        class: document.getElementById('spellClass').value,
+        level: parseInt(document.getElementById('spellLevel').value, 10),
+        range: document.getElementById('spellRange').value,
+        duration: document.getElementById('spellDuration').value,
+        description: document.getElementById('spellDesc').value,
+        source: 'homebrew'
+      });
+      selectedSpellIds.add(id);
+      this.reset();
+      renderMasterCatalogGrid();
+      renderSidebarSelectedList();
+    });
+
+    document.getElementById('homebrewItemForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const id = 'cust_it_' + Date.now();
+      itemDatabase.unshift({
+        id,
+        name: document.getElementById('itemName').value,
+        type: document.getElementById('itemType').value,
+        rarity: document.getElementById('itemRarity').value,
+        weight: document.getElementById('itemWeight').value,
+        value: document.getElementById('itemValue').value,
+        description: document.getElementById('itemDesc').value,
+        source: 'homebrew'
+      });
+      selectedItemIds.add(id);
+      this.reset();
+      renderMasterCatalogGrid();
+      renderSidebarSelectedList();
+    });
+
+    // ==========================================
+    // EXPORT CORE IMPLEMENTATION MODULE
+    // ==========================================
+    function generateActiveExportPayload(format) {
+      const targets = activeAppMode === 'spells'
+        ? spellDatabase.filter(s => selectedSpellIds.has(s.id))
+        : itemDatabase.filter(i => selectedItemIds.has(i.id));
+
+      if (format === 'json') return JSON.stringify(targets, null, 2);
+
+      if (format === 'markdown') {
+        if (activeAppMode === 'spells') {
+          return targets.map(s => `## ${s.name}\n*__Class:__ ${s.class} | __Level:__ ${s.level}*\n- **Range:** ${s.range}\n- **Duration:** ${s.duration}\n\n> ${s.description}\n\n---`).join('\n\n');
+        } else {
+          return targets.map(i => `## ${i.name}\n*__Type:__ ${i.type} | __Rarity:__ ${i.rarity.toUpperCase()}*\n- **Weight/Bulk:** ${i.weight}\n- **Value:** ${i.value}\n\n> ${i.description}\n\n---`).join('\n\n');
+        }
+      }
+
+      if (format === 'html') {
+        if (activeAppMode === 'spells') {
+          return `<div class="spellbook-container">\n` + targets.map(s => `  <div style="border:2px solid #5a6b47; border-radius:8px; padding:16px; margin-bottom:12px; background:#fafbf9; font-family:sans-serif;">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #5a6b47; padding-bottom:4px; margin-bottom:8px;">
+      <h3 style="margin:0; color:#3b462e;">${s.name}</h3>
+      <span style="font-size:11px; background:#e2ebd5; padding:2px 6px; border-radius:4px; font-weight:bold;">${s.class} Lvl ${s.level}</span>
+    </div>
+    <div style="font-size:12px; margin-bottom:8px; color:#555;"><strong>Range:</strong> ${s.range} | <strong>Duration:</strong> ${s.duration}</div>
+    <p style="margin:0; font-size:13.5px; color:#222;">${s.description}</p>
+  </div>`).join('\n') + `\n</div>`;
+        } else {
+          return `<div class="vault-inventory-container">\n` + targets.map(i => `  <div style="border:2px solid #4a5568; border-radius:8px; padding:16px; margin-bottom:12px; background:#f7fafc; font-family:sans-serif;">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #4a5568; padding-bottom:4px; margin-bottom:8px;">
+      <h3 style="margin:0; color:#2d3748;">${i.name}</h3>
+      <span style="font-size:11px; background:#e2e8f0; color:#4a5568; padding:2px 6px; border-radius:4px; font-weight:bold; text-transform:uppercase;">${i.rarity}</span>
+    </div>
+    <div style="font-size:12px; margin-bottom:8px; color:#718096;"><strong>Type:</strong> ${i.type} | <strong>Bulk:</strong> ${i.weight} | <strong>Value:</strong> ${i.value}</div>
+    <p style="margin:0; font-size:13.5px; color:#1a202c; font-style:italic;">${i.description}</p>
+  </div>`).join('\n') + `\n</div>`;
+        }
+      }
+    }
+
+    function refreshLiveVisualPreview() {
+      const selectedCollection = activeAppMode === 'spells'
+        ? spellDatabase.filter(s => selectedSpellIds.has(s.id))
+        : itemDatabase.filter(i => selectedItemIds.has(i.id));
+
+      if (currentActiveTab === 'json') {
+        visualPanelLabel.textContent = "Live Schema Tree Preview";
+        visualPreview.innerHTML = `
+                    <div style="font-family:monospace; font-size:0.85rem; color:var(--md-sys-color-on-surface-variant)">
+                        <strong style="color:var(--md-sys-color-primary)">Collection Meta Profile:</strong><br>
+                        • Mode Context: ${activeAppMode.toUpperCase()}<br>
+                        • Active Node Elements: ${selectedCollection.length}<br><br>
+                        <hr style="border:none; border-top:1px solid var(--md-sys-color-outline); margin:8px 0;">
+                        ${selectedCollection.map(el => `<div>📦 <strong>${el.name}</strong> <small style="color:var(--md-sys-color-outline)">(${el.id})</small></div>`).join('')}
+                    </div>`;
+        return;
+      }
+
+      if (currentActiveTab === 'markdown') {
+        visualPanelLabel.textContent = "Wiki Standard Simulation";
+        if (activeAppMode === 'spells') {
+          visualPreview.innerHTML = selectedCollection.map(s => `
+                        <div style="margin-bottom:16px; padding:12px; background:#fff; border-radius:6px; border:1px solid #ddd; font-family:Georgia, serif;">
+                            <h3 style="margin:0; color:#111; font-size:1.25rem;">${s.name}</h3>
+                            <div style="font-size:0.8rem; color:#666; margin-bottom:6px;">Class: ${s.class} | Level: ${s.level}</div>
+                            <p style="margin:0; font-size:0.9rem; border-left:3px solid var(--md-sys-color-primary); padding-left:8px; font-style:italic;">${s.description}</p>
+                        </div>`).join('');
+        } else {
+          visualPreview.innerHTML = selectedCollection.map(i => `
+                        <div style="margin-bottom:16px; padding:12px; background:#fff; border-radius:6px; border:1px solid #ddd; font-family:sans-serif;">
+                            <h3 style="margin:0; color:var(--color-rarity-${i.rarity}); font-size:1.2rem;">${i.name}</h3>
+                            <div style="font-size:0.75rem; color:#777; margin-bottom:6px;">Properties: ${i.type} • Weight: ${i.weight}</div>
+                            <p style="margin:0; font-size:0.88rem; color:#333; background:#f9f9f9; padding:6px; border-radius:4px;">${i.description}</p>
+                        </div>`).join('');
+        }
+        return;
+      }
+
+      if (currentActiveTab === 'html') {
+        visualPanelLabel.textContent = "Live Render Preview (Dynamic HTML Component Layout)";
+        visualPreview.innerHTML = generateActiveExportPayload('html');
+      }
+    }
+
+    window.switchExportTab = function (format) {
+      currentActiveTab = format;
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      exportPreview.textContent = generateActiveExportPayload(format);
+      refreshLiveVisualPreview();
+    };
+
+    // Window Modal Actions triggers
+    btnOpenExport.addEventListener('click', () => {
+      const activeSize = activeAppMode === 'spells' ? selectedSpellIds.size : selectedItemIds.size;
+      if (activeSize === 0) {
+        alert(`Your selected storage pool for ${activeAppMode.toUpperCase()} is empty! Add assets to your workbook first.`);
+        return;
+      }
+      document.getElementById('modalMainTitle').textContent = activeAppMode === 'spells' ? "Spell Compendium Export Hub" : "Equipment Vault Export Hub";
+      exportModal.style.display = 'flex';
+      exportPreview.textContent = generateActiveExportPayload(currentActiveTab);
+      refreshLiveVisualPreview();
+    });
+
+    btnCloseModal.addEventListener('click', () => exportModal.style.display = 'none');
+
+    btnCopyClipboard.addEventListener('click', () => {
+      navigator.clipboard.writeText(exportPreview.textContent).then(() => {
+        const prevText = btnCopyClipboard.textContent;
+        btnCopyClipboard.textContent = 'Copied to Clipboard!';
+        setTimeout(() => btnCopyClipboard.textContent = prevText, 1500);
+      });
+    });
+
+    btnDownloadFile.addEventListener('click', () => {
+      const payload = exportPreview.textContent;
+      const ext = currentActiveTab === 'json' ? 'json' : currentActiveTab === 'markdown' ? 'md' : 'html';
+      const filename = `vault_export_${activeAppMode}.${ext}`;
+      const mime = currentActiveTab === 'json' ? 'application/json' : 'text/plain';
+
+      const anchor = document.createElement('a');
+      anchor.setAttribute("href", `data:${mime};charset=utf-8,` + encodeURIComponent(payload));
+      anchor.setAttribute("download", filename);
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+    });
+
+    // Dom Filters Subscriptions
+    document.getElementById('filterClass').addEventListener('change', renderMasterCatalogGrid);
+    document.getElementById('filterLevel').addEventListener('change', renderMasterCatalogGrid);
+    document.getElementById('filterItemType').addEventListener('change', renderMasterCatalogGrid);
+    document.getElementById('filterRarity').addEventListener('change', renderMasterCatalogGrid);
+
+    // Core App Initialize Bootstrapping
+    renderMasterCatalogGrid();
+    renderSidebarSelectedList();
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OSR Spell Master & Exporter</title>
+  <style>
+    :root {
+      /* Core Tones */
+      --md-sys-color-primary: hsl(100, 15%, 30%);
+      --md-sys-color-on-primary: hsl(100, 15%, 98%);
+      --md-sys-color-primary-container: hsl(100, 15%, 90%);
+
+      --md-sys-color-secondary: hsl(130, 10%, 40%);
+      --md-sys-color-on-secondary: #ffffff;
+
+      --md-sys-color-surface: hsl(100, 5%, 98%);
+      --md-sys-color-on-surface: hsl(100, 5%, 10%);
+      --md-sys-color-surface-variant: hsl(100, 10%, 90%);
+      --md-sys-color-on-surface-variant: hsl(100, 10%, 20%);
+
+      --md-sys-color-outline: hsl(100, 10%, 50%);
+
+      /* Highlight Tones (Muted/Pastel) */
+      --md-sys-color-highlight: hsl(280, 40%, 85%);
+      --md-sys-color-on-highlight: hsl(280, 40%, 20%);
+
+      /* Spacing (MD3 Expressive) */
+      --spacing-unit: 4px;
+      --radius-xs: 4px;
+      --radius-s: 8px;
+      --radius-m: 12px;
+      --radius-l: 16px;
+      --radius-xl: 28px;
+      --radius-full: 9999px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    body {
+      background-color: var(--md-sys-color-surface);
+      color: var(--md-sys-color-on-surface);
+      padding: calc(var(--spacing-unit) * 4);
+      line-height: 1.5;
+    }
+
+    header {
+      margin-bottom: calc(var(--spacing-unit) * 6);
+      border-bottom: 1px solid var(--md-sys-color-surface-variant);
+      padding-bottom: calc(var(--spacing-unit) * 4);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: calc(var(--spacing-unit) * 4);
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      color: var(--md-sys-color-primary);
+      font-weight: 700;
+    }
+
+    .main-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: calc(var(--spacing-unit) * 6);
+      align-items: start;
+    }
+
+    @media (min-width: 1024px) {
+      .main-layout {
+        grid-template-columns: 3fr 2fr;
+      }
+    }
+
+    .left-column {
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--spacing-unit) * 6);
+    }
+
+    /* Card Component Styling */
+    .card {
+      background-color: var(--md-sys-color-surface-variant);
+      border-radius: var(--radius-l);
+      padding: calc(var(--spacing-unit) * 4);
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--spacing-unit) * 4);
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface-variant);
+      margin-bottom: calc(var(--spacing-unit) * 2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: calc(var(--spacing-unit) * 2);
+    }
+
+    /* Controls & Form Elements */
+    .filter-group {
+      display: flex;
+      gap: calc(var(--spacing-unit) * 2);
+      flex-wrap: wrap;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: calc(var(--spacing-unit) * 3);
+    }
+
+    @media (min-width: 640px) {
+      .form-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .form-span-full {
+        grid-column: span 3;
+      }
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-unit);
+    }
+
+    .form-field label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    select,
+    input,
+    textarea {
+      padding: calc(var(--spacing-unit) * 2.5) calc(var(--spacing-unit) * 4);
+      border-radius: var(--radius-s);
+      border: 1px solid var(--md-sys-color-outline);
+      background-color: var(--md-sys-color-surface);
+      color: var(--md-sys-color-on-surface);
+      font-size: 0.9rem;
+      cursor: pointer;
+      outline: none;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    select:focus,
+    input:focus,
+    textarea:focus {
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 2px var(--md-sys-color-primary-container);
+    }
+
+    /* Buttons */
+    .btn {
+      padding: calc(var(--spacing-unit) * 2.5) calc(var(--spacing-unit) * 4);
+      border-radius: var(--radius-full);
+      border: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: calc(var(--spacing-unit) * 2);
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background-color: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+    }
+
+    .btn-primary:hover {
+      background-color: hsl(100, 15%, 25%);
+    }
+
+    .btn-secondary {
+      background-color: var(--md-sys-color-secondary);
+      color: var(--md-sys-color-on-secondary);
+    }
+
+    .btn-secondary:hover {
+      background-color: hsl(130, 10%, 35%);
+    }
+
+    .btn-sm {
+      padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 3);
+      font-size: 0.8rem;
+      border-radius: var(--radius-s);
+    }
+
+    /* Lists and Grid Items */
+    .spell-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: calc(var(--spacing-unit) * 3);
+    }
+
+    @media (min-width: 640px) {
+      .spell-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      }
+    }
+
+    .spell-card {
+      background-color: var(--md-sys-color-surface);
+      border: 1px solid transparent;
+      border-radius: var(--radius-m);
+      padding: calc(var(--spacing-unit) * 3);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: calc(var(--spacing-unit) * 2);
+      transition: border-color 0.2s;
+    }
+
+    .spell-card:hover {
+      border-color: var(--md-sys-color-outline);
+    }
+
+    .spell-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: var(--spacing-unit);
+    }
+
+    .spell-name {
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface);
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      padding: calc(var(--spacing-unit) * 0.5) calc(var(--spacing-unit) * 1.5);
+      border-radius: var(--radius-xs);
+      font-weight: bold;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .badge-level {
+      background-color: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-primary);
+    }
+
+    .badge-class {
+      background-color: var(--md-sys-color-highlight);
+      color: var(--md-sys-color-on-highlight);
+    }
+
+    .badge-homebrew {
+      background-color: hsl(30, 80%, 85%);
+      color: hsl(30, 80%, 20%);
+    }
+
+    .spell-details {
+      font-size: 0.85rem;
+      color: var(--md-sys-color-on-surface-variant);
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-top: calc(var(--spacing-unit) * 1);
+    }
+
+    /* Selected Spell Book / Sidebar List */
+    .selected-list {
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--spacing-unit) * 2);
+      max-height: 720px;
+      overflow-y: auto;
+      padding-right: calc(var(--spacing-unit) * 1);
+    }
+
+    .selected-item {
+      background-color: var(--md-sys-color-surface);
+      padding: calc(var(--spacing-unit) * 2.5) calc(var(--spacing-unit) * 3);
+      border-radius: var(--radius-s);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: calc(var(--spacing-unit) * 2);
+    }
+
+    .selected-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .selected-name {
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    .selected-meta {
+      font-size: 0.75rem;
+      color: var(--md-sys-color-outline);
+    }
+
+    .btn-remove {
+      background: none;
+      border: none;
+      color: hsl(0, 70%, 50%);
+      font-weight: bold;
+      cursor: pointer;
+      padding: calc(var(--spacing-unit) * 1);
+      font-size: 1.1rem;
+    }
+
+    .btn-remove:hover {
+      color: hsl(0, 80%, 40%);
+    }
+
+    .empty-state {
+      text-align: center;
+      color: var(--md-sys-color-outline);
+      padding: calc(var(--spacing-unit) * 8) 0;
+      font-style: italic;
+    }
+
+    /* Modal / Dialog Layout overlay */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: calc(var(--spacing-unit) * 4);
+    }
+
+    .modal-container {
+      background-color: var(--md-sys-color-surface);
+      color: var(--md-sys-color-on-surface);
+      max-width: 750px;
+      width: 100%;
+      max-height: 85vh;
+      border-radius: var(--radius-xl);
+      padding: calc(var(--spacing-unit) * 6);
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--spacing-unit) * 4);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .tab-bar {
+      display: flex;
+      gap: calc(var(--spacing-unit) * 2);
+      border-bottom: 2px solid var(--md-sys-color-surface-variant);
+      padding-bottom: calc(var(--spacing-unit) * 2);
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 4);
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--md-sys-color-outline);
+      border-radius: var(--radius-s);
+    }
+
+    .tab-btn.active {
+      color: var(--md-sys-color-primary);
+      background-color: var(--md-sys-color-primary-container);
+    }
+
+    .preview-box {
+      background-color: #1e1e1e;
+      color: #d4d4d4;
+      padding: calc(var(--spacing-unit) * 4);
+      border-radius: var(--radius-m);
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.85rem;
+      overflow: auto;
+      flex-grow: 1;
+      white-space: pre-wrap;
+      border: 1px solid var(--md-sys-color-outline);
+    }
+
+    /* Custom Scrollbar for layouts */
+    .selected-list::-webkit-scrollbar,
+    .preview-box::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    .selected-list::-webkit-scrollbar-track,
+    .preview-box::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .selected-list::-webkit-scrollbar-thumb,
+    .preview-box::-webkit-scrollbar-thumb {
+      background: var(--md-sys-color-outline);
+      border-radius: var(--radius-full);
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div>
+      <h1>OSR Spell Compendium & Exporter</h1>
+      <p style="color: var(--md-sys-color-outline); font-size: 0.9rem;">Craft homebrew rules, assemble campaign modules,
+        and generate multi-format outputs.</p>
+    </div>
+    <button class="btn btn-secondary" id="btnOpenExport">
+      Open Export Center
+    </button>
+  </header>
+
+  <div class="main-layout">
+    <div class="left-column">
+
+      <section class="card">
+        <h2 class="card-title">Forge Custom Homebrew Spell</h2>
+        <form id="homebrewForm" class="form-grid">
+          <div class="form-field">
+            <label for="spellName">Spell Name</label>
+            <input type="text" id="spellName" placeholder="e.g., Isaac's Missile Storm" required>
+          </div>
+          <div class="form-field">
+            <label for="spellClass">Class Association</label>
+            <select id="spellClass">
+              <option value="Magic-User">Magic-User</option>
+              <option value="Cleric">Cleric</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="spellLevel">Spell Level</label>
+            <select id="spellLevel">
+              <option value="1">Level 1</option>
+              <option value="2">Level 2</option>
+              <option value="3">Level 3</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="spellRange">Range</label>
+            <input type="text" id="spellRange" placeholder="e.g., 60 feet or Touch" required>
+          </div>
+          <div class="form-field">
+            <label for="spellDuration">Duration</label>
+            <input type="text" id="spellDuration" placeholder="e.g., Instantaneous or 3 turns" required>
+          </div>
+          <div class="form-field">
+            <label>&nbsp;</label>
+            <button type="submit" class="btn btn-primary" style="border-radius: var(--radius-s)">
+              + Add to Pool
+            </button>
+          </div>
+          <div class="form-field form-span-full">
+            <label for="spellDesc">Spell Effects / Description</label>
+            <textarea id="spellDesc"
+              placeholder="Describe the mechanical boundaries, saving throws, and sensory details of the spell..."
+              required></textarea>
+          </div>
+        </form>
+      </section>
+
+      <main class="card">
+        <div class="card-title">
+          <span>Available Spells</span>
+          <div class="filter-group">
+            <select id="filterClass">
+              <option value="all">All Classes</option>
+              <option value="Magic-User">Magic-User</option>
+              <option value="Cleric">Cleric</option>
+            </select>
+            <select id="filterLevel">
+              <option value="all">All Levels</option>
+              <option value="1">Level 1</option>
+              <option value="2">Level 2</option>
+              <option value="3">Level 3</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="spell-grid" id="spellGrid">
+        </div>
+      </main>
+    </div>
+
+    <aside class="card">
+      <div class="card-title">
+        <span>Your Selected Spells</span>
+        <span id="selectionCount" class="badge badge-level">0 Selected</span>
+      </div>
+
+      <div class="selected-list" id="selectedList">
+      </div>
+    </aside>
+  </div>
+
+  <div class="modal-overlay" id="exportModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h2 style="color: var(--md-sys-color-primary);">Multi-Format Export Hub</h2>
+        <button class="btn-remove" id="btnCloseModal" style="font-size:1.75rem;">&times;</button>
+      </div>
+
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchExportTab('json')">Raw JSON</button>
+        <button class="tab-btn" onclick="switchExportTab('markdown')">Wiki Markdown</button>
+        <button class="tab-btn" onclick="switchExportTab('html')">HTML Cards block</button>
+      </div>
+
+      <div class="preview-box" id="exportPreview"></div>
+
+      <div style="display: flex; justify-content: flex-end; gap: calc(var(--spacing-unit)*3);">
+        <button class="btn btn-secondary" id="btnCopyClipboard">Copy Code</button>
+        <button class="btn btn-primary" id="btnDownloadFile">Download File</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Initial Classic BX Core Database
+    const spellDatabase = [
+      { id: "mu1", class: "Magic-User", level: 1, name: "Charm Person", range: "120 feet", duration: "Special", description: "Brings a humanoid under the caster's influence if they fail a saving throw.", source: "core" },
+      { id: "mu2", class: "Magic-User", level: 1, name: "Detect Magic", range: "60 feet", duration: "2 turns", description: "Allows the caster to perceive magical energies radiating from objects or areas.", source: "core" },
+      { id: "mu3", class: "Magic-User", level: 1, name: "Magic Missile", range: "150 feet", duration: "Instantaneous", description: "Creates an unerring dart of magical energy dealing 1d6+1 damage.", source: "core" },
+      { id: "mu4", class: "Magic-User", level: 1, name: "Sleep", range: "240 feet", duration: "4 turns + 4/level", description: "Puts 2d8 Hit Dice of creatures into a magical slumber.", source: "core" },
+      { id: "mu5", class: "Magic-User", level: 2, name: "Invisibility", range: "Touch", duration: "Permanent until attacking", description: "Renders a creature completely invisible until they attack or cast a spell.", source: "core" },
+      { id: "mu6", class: "Magic-User", level: 2, name: "Web", range: "10 feet", duration: "2 turns", description: "Fills a 10-foot cube with sticky, structural threads that trap creatures.", source: "core" },
+      { id: "mu7", class: "Magic-User", level: 3, name: "Fireball", range: "240 feet", duration: "Instantaneous", description: "An explosion of flame dealing 1d6 damage per caster level to all within a 20-foot radius.", source: "core" },
+      { id: "mu8", class: "Magic-User", level: 3, name: "Fly", range: "Touch", duration: "1d6 turns + 1/level", description: "Grants the subject the ability to fly through the air up to 120 feet per turn.", source: "core" },
+
+      { id: "cl1", class: "Cleric", level: 1, name: "Cure Light Wounds", range: "Touch", duration: "Instantaneous", description: "Heals a touched creature of 1d6+1 points of damage.", source: "core" },
+      { id: "cl2", class: "Cleric", level: 1, name: "Detect Evil", range: "120 feet", duration: "6 turns", description: "Discovers evil intentions or unholy objects within the line of sight.", source: "core" },
+      { id: "cl3", class: "Cleric", level: 1, name: "Purify Food and Water", range: "10 feet", duration: "Instantaneous", description: "Makes spoiled, rotten, or poisoned rations completely safe.", source: "core" },
+      { id: "cl4", class: "Cleric", level: 2, name: "Bless", range: "60 feet", duration: "6 turns", description: "Raises morale and gives +1 to hit rolls for allies not currently in melee.", source: "core" },
+      { id: "cl5", class: "Cleric", level: 2, name: "Hold Person", range: "180 feet", duration: "9 turns", description: "Paralyzes up to 1d4 targets who fail a saving throw vs. Spells.", source: "core" },
+      { id: "cl6", class: "Cleric", level: 3, name: "Cure Disease", range: "Touch", duration: "Instantaneous", description: "Immediately cures the target of any afflictions, curses, or physical diseases.", source: "core" }
+    ];
+
+    // Application Tracking States
+    let selectedSpellIds = new Set();
+    let currentActiveTab = 'json';
+
+    // DOM elements
+    const filterClass = document.getElementById('filterClass');
+    const filterLevel = document.getElementById('filterLevel');
+    const spellGrid = document.getElementById('spellGrid');
+    const selectedList = document.getElementById('selectedList');
+    const selectionCount = document.getElementById('selectionCount');
+    const homebrewForm = document.getElementById('homebrewForm');
+
+    // Modal components
+    const exportModal = document.getElementById('exportModal');
+    const btnOpenExport = document.getElementById('btnOpenExport');
+    const btnCloseModal = document.getElementById('btnCloseModal');
+    const exportPreview = document.getElementById('exportPreview');
+    const btnCopyClipboard = document.getElementById('btnCopyClipboard');
+    const btnDownloadFile = document.getElementById('btnDownloadFile');
+
+    // Render function: Master pool browser
+    function renderAvailableSpells() {
+      const classFilter = filterClass.value;
+      const levelFilter = filterLevel.value;
+
+      const filteredSpells = spellDatabase.filter(spell => {
+        const matchClass = classFilter === 'all' || spell.class === classFilter;
+        const matchLevel = levelFilter === 'all' || spell.level.toString() === levelFilter;
+        return matchClass && matchLevel;
+      });
+
+      if (filteredSpells.length === 0) {
+        spellGrid.innerHTML = `<div class="empty-state" style="grid-column: 1/-1;">No spells match your active filter setup.</div>`;
+        return;
+      }
+
+      spellGrid.innerHTML = filteredSpells.map(spell => {
+        const isSelected = selectedSpellIds.has(spell.id);
+        const isHomebrew = spell.source === 'homebrew';
+        return `
+                    <div class="spell-card" style="${isHomebrew ? 'border-left: 4px solid hsl(30, 80%, 50%)' : ''}">
+                        <div>
+                            <div class="spell-header">
+                                <span class="spell-name">${spell.name}</span>
+                                <div style="display:flex; gap:2px; flex-direction:column; align-items:flex-end;">
+                                    ${isHomebrew ? '<span class="badge badge-homebrew">Homebrew</span>' : ''}
+                                    <span class="badge badge-class">${spell.class}</span>
+                                    <span class="badge badge-level">Lvl ${spell.level}</span>
+                                </div>
+                            </div>
+                            <p class="spell-details" title="${spell.description}">${spell.description}</p>
+                            <div style="font-size: 0.75rem; color: var(--md-sys-color-outline); margin-top: 6px;">
+                                <strong>Range:</strong> ${spell.range} <br><strong>Duration:</strong> ${spell.duration}
+                            </div>
+                        </div>
+                        <button 
+                            class="btn btn-sm ${isSelected ? 'btn-secondary' : 'btn-primary'}" 
+                            onclick="toggleSpell('${spell.id}')"
+                            style="margin-top: calc(var(--spacing-unit) * 3); width: 100%;"
+                        >
+                            ${isSelected ? '✓ Selected' : 'Add to Book'}
+                        </button>
+                    </div>
+                `;
+      }).join('');
+    }
+
+    // Render function: Sidebar selected book
+    function renderSelectedSpells() {
+      selectionCount.textContent = `${selectedSpellIds.size} Selected`;
+
+      if (selectedSpellIds.size === 0) {
+        selectedList.innerHTML = `<div class="empty-state">No spells chosen yet. Browse the archive to build your spellbook.</div>`;
+        return;
+      }
+
+      const chosenSpells = spellDatabase.filter(spell => selectedSpellIds.has(spell.id));
+
+      selectedList.innerHTML = chosenSpells.map(spell => `
+                <div class="selected-item" style="${spell.source === 'homebrew' ? 'border-left: 3px solid hsl(30, 80%, 50%)' : ''}">
+                    <div class="selected-info">
+                        <span class="selected-name">${spell.name}</span>
+                        <span class="selected-meta">${spell.class} — Level ${spell.level} ${spell.source === 'homebrew' ? '(Homebrew)' : ''}</span>
+                    </div>
+                    <button class="btn-remove" onclick="toggleSpell('${spell.id}')" title="Remove spell">&times;</button>
+                </div>
+            `).join('');
+    }
+
+    // Generators for content distribution format profiles
+    function generateExportPayload(format) {
+      const chosenSpells = spellDatabase.filter(spell => selectedSpellIds.has(spell.id));
+
+      if (format === 'json') {
+        return JSON.stringify(chosenSpells, null, 2);
+      }
+
+      if (format === 'markdown') {
+        return chosenSpells.map(spell => {
+          return `## ${spell.name}\n*__Class:__ ${spell.class} | __Level:__ ${spell.level} (${spell.source.toUpperCase()})*\n- **Range:** ${spell.range}\n- **Duration:** ${spell.duration}\n\n> ${spell.description}\n\n---`;
+        }).join('\n\n');
+      }
+
+      if (format === 'html') {
+        const rawCardsHTML = chosenSpells.map(spell => {
+          return `  <div style="border: 2px solid #5a6b47; border-radius: 8px; padding: 16px; margin-bottom: 12px; background-color: #fafbf9; font-family: sans-serif;">
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #5a6b47; padding-bottom: 6px; margin-bottom: 8px;">
+      <h3 style="margin: 0; color: #3b462e;">${spell.name}</h3>
+      <span style="font-size: 12px; background: #e2ebd5; padding: 2px 6px; border-radius: 4px; font-weight: bold;">${spell.class} Lvl ${spell.level}</span>
+    </div>
+    <div style="font-size: 13px; margin-bottom: 8px; color: #666;">
+      <strong>Range:</strong> ${spell.range} | <strong>Duration:</strong> ${spell.duration}
+    </div>
+    <p style="margin: 0; font-size: 14px; line-height: 1.4; color: #222;">${spell.description}</p>
+  </div>`;
+        }).join('\n');
+        return `<div class="spellbook-container">\n${rawCardsHTML}\n</div>`;
+      }
+      return '';
+    }
+
+    // Action: Tab Control management updates 
+    window.switchExportTab = function (format) {
+      currentActiveTab = format;
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      exportPreview.textContent = generateExportPayload(format);
+    }
+
+    // Action: Selection Toggle Switcher
+    window.toggleSpell = function (id) {
+      if (selectedSpellIds.has(id)) {
+        selectedSpellIds.delete(id);
+      } else {
+        selectedSpellIds.add(id);
+      }
+      renderAvailableSpells();
+      renderSelectedSpells();
+      if (exportModal.style.display === 'flex') {
+        exportPreview.textContent = generateExportPayload(currentActiveTab);
+      }
+    };
+
+    // Action: Form Submission Handler for Homebrew Spells
+    homebrewForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('spellName').value;
+      const className = document.getElementById('spellClass').value;
+      const level = parseInt(document.getElementById('spellLevel').value, 10);
+      const range = document.getElementById('spellRange').value;
+      const duration = document.getElementById('spellDuration').value;
+      const description = document.getElementById('spellDesc').value;
+
+      const id = 'custom_' + Date.now();
+
+      spellDatabase.unshift({ id, class: className, level, name, range, duration, description, source: 'homebrew' });
+      selectedSpellIds.add(id);
+
+      homebrewForm.reset();
+      renderAvailableSpells();
+      renderSelectedSpells();
+    });
+
+    // Modal Action Systems Interactivity
+    btnOpenExport.addEventListener('click', () => {
+      if (selectedSpellIds.size === 0) {
+        alert("Your spellbook is currently empty! Please pick or build some spells first.");
+        return;
+      }
+      exportModal.style.display = 'flex';
+      exportPreview.textContent = generateExportPayload(currentActiveTab);
+    });
+
+    btnCloseModal.addEventListener('click', () => {
+      exportModal.style.display = 'none';
+    });
+
+    btnCopyClipboard.addEventListener('click', () => {
+      const payload = exportPreview.textContent;
+      navigator.clipboard.writeText(payload).then(() => {
+        const originalText = btnCopyClipboard.textContent;
+        btnCopyClipboard.textContent = 'Copied to Clipboard!';
+        setTimeout(() => btnCopyClipboard.textContent = originalText, 1800);
+      }).catch(err => {
+        alert('Failed to copy text securely.');
+      });
+    });
+
+    btnDownloadFile.addEventListener('click', () => {
+      const payload = exportPreview.textContent;
+      let filename = `spellbook.${currentActiveTab === 'json' ? 'json' : currentActiveTab === 'markdown' ? 'md' : 'html'}`;
+      let mime = currentActiveTab === 'json' ? 'application/json' : 'text/plain';
+
+      const dataStr = `data:${mime};charset=utf-8,` + encodeURIComponent(payload);
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", filename);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    });
+
+    // Filter triggers
+    filterClass.addEventListener('change', renderAvailableSpells);
+    filterLevel.addEventListener('change', renderAvailableSpells);
+
+    // Initial App Mount Execution
+    renderAvailableSpells();
+    renderSelectedSpells();
+  </script>
+</body>
+
+</html>

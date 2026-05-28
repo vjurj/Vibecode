@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Responsive Design & Container Queries Interactive Guide</title>
+  <style>
+    :root {
+      /* Core Tones */
+      --md-sys-color-primary: hsl(100, 15%, 30%);
+      --md-sys-color-on-primary: hsl(100, 15%, 98%);
+      --md-sys-color-primary-container: hsl(100, 15%, 90%);
+
+      --md-sys-color-secondary: hsl(130, 10%, 40%);
+      --md-sys-color-on-secondary: #ffffff;
+
+      --md-sys-color-surface: hsl(100, 5%, 98%);
+      --md-sys-color-on-surface: hsl(100, 5%, 10%);
+      --md-sys-color-surface-variant: hsl(100, 10%, 90%);
+      --md-sys-color-on-surface-variant: hsl(100, 10%, 20%);
+
+      --md-sys-color-outline: hsl(100, 10%, 50%);
+
+      /* Highlight Tones (Muted/Pastel) */
+      --md-sys-color-highlight: hsl(280, 40%, 85%);
+      --md-sys-color-on-highlight: hsl(280, 40%, 20%);
+
+      /* Spacing (MD3 Expressive) */
+      --spacing-unit: 4px;
+      --radius-xs: 4px;
+      --radius-s: 8px;
+      --radius-m: 12px;
+      --radius-l: 16px;
+      --radius-xl: 28px;
+      --radius-full: 9999px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    body {
+      background-color: var(--md-sys-color-surface);
+      color: var(--md-sys-on-surface);
+      line-height: 1.6;
+      padding: calc(var(--spacing-unit) * 4);
+    }
+
+    header {
+      background: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-on-surface-variant);
+      padding: calc(var(--spacing-unit) * 6);
+      border-radius: var(--radius-l);
+      margin-bottom: calc(var(--spacing-unit) * 6);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    header h1 {
+      color: var(--md-sys-color-primary);
+      margin-bottom: calc(var(--spacing-unit) * 2);
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+    }
+
+    .live-reporter {
+      background: var(--md-sys-color-highlight);
+      color: var(--md-sys-color-on-highlight);
+      padding: calc(var(--spacing-unit) * 3) calc(var(--spacing-unit) * 4);
+      border-radius: var(--radius-m);
+      font-weight: bold;
+      display: inline-flex;
+      align-items: center;
+      gap: calc(var(--spacing-unit) * 2);
+      margin-top: calc(var(--spacing-unit) * 2);
+      flex-wrap: wrap;
+    }
+
+    /* Responsive Grid System Layout */
+    .grid-container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: calc(var(--spacing-unit) * 6);
+    }
+
+    @media (min-width: 1024px) {
+      .grid-container {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .card {
+      background: white;
+      border: 1px solid var(--md-sys-color-surface-variant);
+      border-radius: var(--radius-l);
+      padding: calc(var(--spacing-unit) * 6);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    }
+
+    .card h2 {
+      color: var(--md-sys-color-primary);
+      margin-bottom: calc(var(--spacing-unit) * 4);
+      border-bottom: 2px solid var(--md-sys-color-primary-container);
+      padding-bottom: calc(var(--spacing-unit) * 2);
+    }
+
+    /* Step Illustration Styles */
+    .step-list {
+      list-style-type: none;
+    }
+
+    .step-item {
+      margin-bottom: calc(var(--spacing-unit) * 4);
+      padding-left: calc(var(--spacing-unit) * 10);
+      position: relative;
+    }
+
+    .step-item::before {
+      content: attr(data-step);
+      position: absolute;
+      left: 0;
+      top: 2px;
+      background: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+
+    .step-title {
+      font-weight: 700;
+      color: var(--md-sys-color-on-surface);
+    }
+
+    /* Interactive Canvas for Testing Breakpoints */
+    .sandbox-container {
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--spacing-unit) * 3);
+    }
+
+    .sandbox-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: calc(var(--spacing-unit) * 2);
+    }
+
+    button {
+      background-color: var(--md-sys-color-surface-variant);
+      color: var(--md-sys-color-on-surface-variant);
+      border: 1px solid var(--md-sys-color-outline);
+      padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 4);
+      border-radius: var(--radius-s);
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    button:hover {
+      background-color: var(--md-sys-color-primary);
+      color: var(--md-sys-on-primary);
+    }
+
+    button.active {
+      background-color: var(--md-sys-color-secondary);
+      color: var(--md-sys-color-on-secondary);
+      border-color: var(--md-sys-color-secondary);
+    }
+
+    .simulator-viewport-wrapper {
+      background: #eee;
+      border-radius: var(--radius-m);
+      padding: calc(var(--spacing-unit) * 4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .simulator-viewport {
+      background: white;
+      width: 100%;
+      height: 380px;
+      border: 3px solid var(--md-sys-color-outline);
+      border-radius: var(--radius-s);
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow-y: auto;
+      padding: calc(var(--spacing-unit) * 4);
+    }
+
+    /* ----------------------------------------------- */
+    /* CONTAINER QUERY MECHANICS (The Core Addition)    */
+    /* ----------------------------------------------- */
+
+    /* 1. Define the structural parent element as a container context */
+    .interactive-preview-container {
+      container-type: inline-size;
+      container-name: productCardContext;
+      background: var(--md-sys-color-surface);
+      padding: calc(var(--spacing-unit) * 3);
+      border-radius: var(--radius-m);
+      border: 2px dashed var(--md-sys-color-outline);
+      margin-top: calc(var(--spacing-unit) * 4);
+    }
+
+    /* 2. Setup default/mobile component styling (Stacked state) */
+    .adaptive-product-card {
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--spacing-unit) * 3);
+      background: white;
+      padding: calc(var(--spacing-unit) * 4);
+      border-radius: var(--radius-s);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .product-image-mock {
+      height: 120px;
+      background: var(--md-sys-color-primary);
+      border-radius: var(--radius-xs);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+    }
+
+    /* 3. Declare container modifications independent of global screen resolution */
+    @container productCardContext (min-width: 450px) {
+      .adaptive-product-card {
+        flex-direction: row;
+        align-items: center;
+      }
+
+      .product-image-mock {
+        width: 140px;
+        height: 90px;
+        flex-shrink: 0;
+      }
+
+      .adaptive-product-card::after {
+        content: "✨ Parent > 450px: Flipped to Row!";
+        display: block;
+        font-size: 0.75rem;
+        background: var(--md-sys-color-highlight);
+        color: var(--md-sys-color-on-highlight);
+        padding: 4px 8px;
+        border-radius: var(--radius-xs);
+        margin-left: auto;
+      }
+    }
+
+    .sim-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: calc(var(--spacing-unit) * 3);
+      margin-top: calc(var(--spacing-unit) * 3);
+    }
+
+    .sim-box {
+      background: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-primary);
+      padding: calc(var(--spacing-unit) * 4);
+      border-radius: var(--radius-m);
+      flex: 1 1 140px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .fluid-text-demo {
+      font-size: clamp(0.9rem, 2.5vw, 1.4rem);
+      background: var(--md-sys-color-surface-variant);
+      padding: calc(var(--spacing-unit) * 3);
+      border-radius: var(--radius-s);
+      margin-top: calc(var(--spacing-unit) * 2);
+    }
+
+    code {
+      background: #23272e;
+      color: #abb2bf;
+      padding: 2px 6px;
+      border-radius: var(--radius-xs);
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.9em;
+    }
+
+    pre {
+      background: #23272e;
+      color: #abb2bf;
+      padding: calc(var(--spacing-unit) * 4);
+      border-radius: var(--radius-m);
+      overflow-x: auto;
+      margin-top: calc(var(--spacing-unit) * 2);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>Responsive Layout & Container Query Procedures</h1>
+    <p>An interactive workspace showcasing standard responsive layout practices matched with modern CSS Container
+      execution metrics.</p>
+    <div class="live-reporter" id="viewport-reporter">
+      <span>Global Window Width:</span> <span id="window-width">000px</span>
+      <span>| Active Breakpoint:</span> <span id="breakpoint-zone">Unknown</span>
+    </div>
+  </header>
+
+  <main class="grid-container">
+
+    <section class="card">
+      <h2>The Combined Styling Paradigm</h2>
+      <ul class="step-list">
+        <li class="step-item" data-step="1">
+          <span class="step-title">Viewport Scaling (Media Queries)</span>
+          <p>Handles macro-layout structure (e.g., controlling main page grids, column setups, and overall site layout
+            blocks based on screen real estate).</p>
+        </li>
+        <li class="step-item" data-step="2">
+          <span class="step-title">Declare Container Scope</span>
+          <p>To let elements adapt based on parent sizing rather than viewports, assign a containment target in CSS:</p>
+          <pre><code>.parent-wrapper {
+  container-type: inline-size;
+  container-name: dynamicCard;
+}</code></pre>
+        </li>
+        <li class="step-item" data-step="3">
+          <span class="step-title">Style via Component Rules</span>
+          <p>Target child mutations strictly relative to the operational footprint of their explicit parent bounding box
+            container.</p>
+          <pre><code>@container dynamicCard (min-width: 450px) {
+  .child-component {
+    flex-direction: row;
+  }
+}</code></pre>
+        </li>
+      </ul>
+    </section>
+
+    <section class="card sandbox-container">
+      <h2>Interactive Multi-Sizing Visualizer</h2>
+      <p>Toggle the width constraint buttons below to observe how typography (via <code>clamp()</code>), elements (via
+        Flexbox/Grid), and components (via Container Queries) reflow instantly inside the context box.</p>
+
+      <div class="sandbox-controls" id="controls">
+        <button onclick="setSimulatedWidth('340px', this)" class="active">Narrow Frame (340px)</button>
+        <button onclick="setSimulatedWidth('560px', this)">Wide Frame (560px)</button>
+        <button onclick="setSimulatedWidth('100%', this)">Fluid Flow (100%)</button>
+      </div>
+
+      <div class="simulator-viewport-wrapper">
+        <div style="font-weight: bold; margin-bottom: 4px; font-size: 0.85rem;" id="sim-width-tracker">Current Target
+          Space: 340px</div>
+
+        <div class="simulator-viewport" id="simulator">
+
+          <div class="fluid-text-demo">
+            Fluid Text via <code>clamp()</code>
+          </div>
+
+          <div class="sim-row">
+            <div class="sim-box">Flex-Box A</div>
+            <div class="sim-box">Flex-Box B</div>
+          </div>
+
+          <div class="interactive-preview-container">
+            <div style="font-size:0.75rem; margin-bottom:4px; font-weight:bold; color:var(--md-sys-color-outline)">
+              [Container Query Monitored Space]</div>
+
+            <div class="adaptive-product-card">
+              <div class="product-image-mock">IMAGE ASSET</div>
+              <div>
+                <h4 style="margin-bottom:2px;">Dynamic Component Card</h4>
+                <p style="font-size:0.8rem; color:#555;">I shift shape automatically when my micro container container
+                  gets extra room.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    function updateLiveMetrics() {
+      const width = window.innerWidth;
+      document.getElementById('window-width').textContent = `${width}px`;
+
+      let zone = 'Desktop UI Layout';
+      if (width < 600) {
+        zone = 'Mobile UI Layout';
+      } else if (width < 1024) {
+        zone = 'Tablet UI Layout';
+      }
+      document.getElementById('breakpoint-zone').textContent = zone;
+    }
+
+    function setSimulatedWidth(widthValue, buttonRef) {
+      const buttons = document.querySelectorAll('#controls button');
+      buttons.forEach(btn => btn.classList.remove('active'));
+
+      const targetElement = document.getElementById('simulator');
+      targetElement.style.width = widthValue;
+      buttonRef.classList.add('active');
+
+      // Force visual dimensions display updates
+      setTimeout(() => {
+        document.getElementById('sim-width-tracker').textContent = `Current Target Space: ${targetElement.offsetWidth}px`;
+      }, 450);
+    }
+
+    window.addEventListener('resize', updateLiveMetrics);
+    window.addEventListener('DOMContentLoaded', () => {
+      updateLiveMetrics();
+      setSimulatedWidth('340px', document.querySelector('#controls button'));
+    });
+  </script>
+</body>
+
+</html>

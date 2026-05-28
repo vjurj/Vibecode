@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TaskFlow Mobile - Minimalist To-Do & PDF Planner</title>
+  <title>TaskFlow Mobile - Minimalist To-Do & A4 Phone-Optimized Planner</title>
   <style>
     :root {
       /* Core Tones */
@@ -29,7 +29,6 @@
       /* Extra status colors */
       --md-sys-color-error: hsl(0, 75%, 40%);
       --md-sys-color-error-container: hsl(0, 75%, 95%);
-      --md-sys-color-success-container: hsl(130, 30%, 90%);
 
       /* Spacing (MD3 Expressive) */
       --spacing-unit: 4px;
@@ -167,13 +166,6 @@
       background: var(--md-sys-color-surface);
       color: var(--md-sys-color-on-surface);
       outline: none;
-      transition: border-color 0.2s;
-    }
-
-    input[type="text"]:focus,
-    select:focus {
-      border-color: var(--md-sys-color-primary);
-      box-shadow: 0 0 0 2px var(--md-sys-color-primary-container);
     }
 
     .button-row {
@@ -195,27 +187,17 @@
       cursor: pointer;
       text-align: center;
       text-decoration: none;
-      transition: opacity 0.2s, transform 0.1s;
     }
 
-    .btn:active {
-      transform: scale(0.97);
-    }
-
-    .btn-secondary {
-      background-color: var(--md-sys-color-secondary);
-      color: var(--md-sys-color-on-secondary);
+    .btn-export {
+      background-color: var(--md-sys-color-highlight);
+      color: var(--md-sys-color-on-highlight);
     }
 
     .btn-outline {
       background-color: transparent;
       border: 1px solid var(--md-sys-color-outline);
       color: var(--md-sys-color-primary);
-    }
-
-    .btn-export {
-      background-color: var(--md-sys-color-highlight);
-      color: var(--md-sys-color-on-highlight);
     }
 
     .w-100 {
@@ -247,7 +229,7 @@
 
     /* To-do List View */
     .todo-list {
-      margin-bottom: calc(var(--spacing-unit) * 10);
+      margin-bottom: calc(var(--spacing-unit) * 12);
     }
 
     .todo-item {
@@ -259,7 +241,6 @@
       display: table;
       width: 100%;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
-      transition: all 0.2s;
     }
 
     .todo-item.completed {
@@ -286,7 +267,7 @@
       width: 40px;
     }
 
-    /* Custom Checkbox Custom Styling for MD3 feel */
+    /* Custom Checkbox */
     .check-container {
       position: relative;
       display: inline-block;
@@ -298,9 +279,8 @@
     .check-container input {
       position: absolute;
       opacity: 0;
-      cursor: pointer;
-      height: 0;
       width: 0;
+      height: 0;
     }
 
     .checkmark {
@@ -384,23 +364,20 @@
       color: var(--md-sys-color-error);
       font-size: 20px;
       cursor: pointer;
-      line-height: 1;
       padding: 4px;
     }
 
     .empty-state {
       text-align: center;
-      padding: calc(var(--spacing-unit) * 10) calc(var(--spacing-unit) * 4);
+      padding: 40px 16px;
       color: var(--md-sys-color-outline);
       font-size: 14px;
     }
 
-    /* PDF Preview & Export Overlay Layout */
     #print-preview-container {
       display: none;
     }
 
-    /* Floating Action Layout for Immediate Export at bottom */
     .bottom-action-bar {
       position: fixed;
       bottom: 16px;
@@ -411,12 +388,11 @@
       z-index: 100;
     }
 
-    /* Native Print Rules matching exact Mobile Screen Aspect / Dimensions */
+    /* iOS & Standard A4 Print Rules: Massively scaled up content for absolute phone screen legibility */
     @media print {
       @page {
-        size: 80mm 160mm;
-        /* Specialized compact mobile viewport sizing for PDF print templates */
-        margin: 6mm;
+        size: A4 portrait;
+        margin: 20mm 15mm;
       }
 
       body {
@@ -424,10 +400,10 @@
         color: #000000 !important;
         padding: 0 !important;
         max-width: 100% !important;
-        font-size: 12px !important;
+        font-size: 22px !important;
+        /* Scaled up text base */
       }
 
-      /* Hide full app controls and chrome UI */
       header,
       .input-card,
       .filter-bar,
@@ -439,77 +415,88 @@
         display: none !important;
       }
 
-      /* Reveal custom optimized print structure */
       #print-preview-container {
         display: block !important;
         width: 100% !important;
       }
 
       .print-title-block {
-        border-bottom: 2px solid #333;
-        padding-bottom: 6px;
-        margin-bottom: 12px;
+        border-bottom: 4px solid hsl(100, 15%, 30%);
+        padding-bottom: 16px;
+        margin-bottom: 32px;
       }
 
       .print-header-title {
-        font-size: 18px !important;
-        font-weight: bold;
-        color: #000000;
+        font-size: 42px !important;
+        /* High prominence header visible when full-page fits mobile screen */
+        font-weight: 800;
+        color: hsl(100, 15%, 30%);
+        letter-spacing: -1px;
       }
 
       .print-date {
-        font-size: 10px;
+        font-size: 18px;
         color: #555;
-        margin-top: 2px;
+        margin-top: 8px;
       }
 
       .print-summary {
-        margin-bottom: 14px;
-        background: #f5f5f5;
-        padding: 6px;
-        border-radius: 4px;
-        font-size: 11px;
+        margin-bottom: 40px;
+        background: hsl(100, 15%, 90%);
+        padding: 20px;
+        border-radius: 12px;
+        font-size: 20px;
+        font-weight: bold;
+        color: hsl(100, 15%, 20%);
       }
 
       .print-todo-item {
-        border-bottom: 1px dashed #ccc;
-        padding: 6px 0;
+        border-bottom: 2px dashed #bbb;
+        padding: 24px 0;
         display: block;
         page-break-inside: avoid;
       }
 
       .print-todo-status {
         display: inline-block;
-        width: 14px;
-        height: 14px;
-        border: 1px solid #000;
-        margin-right: 6px;
+        width: 32px;
+        height: 32px;
+        border: 3px solid #333;
+        margin-right: 16px;
         vertical-align: middle;
         text-align: center;
-        line-height: 12px;
-        font-size: 10px;
-        font-weight: bold;
+        line-height: 24px;
+        font-size: 22px;
+        font-weight: 900;
+        border-radius: 6px;
       }
 
       .print-todo-text {
         display: inline-block;
         vertical-align: middle;
-        width: calc(100% - 70px);
+        width: calc(100% - 160px);
         word-wrap: break-word;
+        font-size: 26px !important;
+        /* Large readable typography standard when zoomed to full-page scale */
+        font-weight: 600;
+        color: #111;
       }
 
       .print-todo-text.done {
         text-decoration: line-through;
-        color: #666;
+        color: #777;
       }
 
       .print-tag {
         float: right;
-        font-size: 9px;
-        border: 1px solid #444;
-        padding: 0px 4px;
-        border-radius: 3px;
-        margin-top: 2px;
+        font-size: 14px;
+        border: 2px solid #555;
+        padding: 2px 10px;
+        border-radius: 9999px;
+        margin-top: 6px;
+        font-weight: bold;
+        text-transform: uppercase;
+        background-color: #f0f0f0;
       }
     }
   </style>
@@ -522,7 +509,7 @@
     <div class="header-title-container">
       <div class="header-cell-main">
         <h1>TaskFlow</h1>
-        <div class="subtitle">Mobile Planner & PDF Exporter</div>
+        <div class="subtitle">A4 PDF Mobile Planner</div>
       </div>
       <div class="header-cell-actions">
         <button class="btn btn-export btn-outline" style="padding: 6px 12px; font-size: 12px;"
@@ -574,18 +561,16 @@
   </div>
 
   <!-- Interactive List Workspace -->
-  <div class="todo-list" id="todo-list-container">
-    <!-- Injected asynchronously -->
-  </div>
+  <div class="todo-list" id="todo-list-container"></div>
 
   <!-- Sticky Floating Action Trigger Bar -->
   <div class="bottom-action-bar">
     <button class="btn btn-export w-100" onclick="window.print()" style="box-shadow: 0 4px 16px rgba(0,0,0,0.15);">
-      ⚡ Export Phone-Optimized PDF
+      🖨️ Share / Export A4 Phone-Optimized PDF
     </button>
   </div>
 
-  <!-- Specialized Print Layout View Structure (Targeted perfectly by @media print) -->
+  <!-- Optimized Print View Structure (Targeted perfectly by iOS PDF stream) -->
   <div id="print-preview-container">
     <div class="print-title-block">
       <div class="print-header-title">My Mobile Task Flow</div>
@@ -594,9 +579,7 @@
     <div class="print-summary" id="print-summary-el">
       Total Tasks: 0 | Completed: 0 | Remaining: 0
     </div>
-    <div id="print-list-elements">
-      <!-- Programmatically cloned nodes tailored for raw print device streams -->
-    </div>
+    <div id="print-list-elements"></div>
   </div>
 
   <script>
@@ -609,18 +592,15 @@
 
     let currentFilter = 'all';
 
-    // Selectors
     const todoInput = document.getElementById('todo-input');
     const todoPriority = document.getElementById('todo-priority');
     const addBtn = document.getElementById('add-btn');
     const container = document.getElementById('todo-list-container');
 
-    // Stats elements
     const countAll = document.getElementById('count-all');
     const countPending = document.getElementById('count-pending');
     const countDone = document.getElementById('count-done');
 
-    // Synchronization & Render Operations
     function saveAndRender() {
       localStorage.setItem('taskflow_todos', JSON.stringify(todos));
       renderList();
@@ -637,9 +617,8 @@
       countPending.textContent = pendingCount;
       countDone.textContent = doneCount;
 
-      // Update print-specific headers
       document.getElementById('print-summary-el').textContent =
-        `Total Items: ${allCount} | Completed: ${doneCount} | Outstanding Active: ${pendingCount}`;
+        `Total Items: ${allCount}   •   Completed: ${doneCount}   •   Pending: ${pendingCount}`;
 
       const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
       document.getElementById('print-date-el').textContent = `Plan status updated: ${new Date().toLocaleDateString(undefined, options)}`;
@@ -693,7 +672,7 @@
       });
 
       if (filteredTodos.length === 0) {
-        container.innerHTML = `<div class="empty-state">No agenda items found under this criteria. Begin by appending tasks above!</div>`;
+        container.innerHTML = `<div class="empty-state">No agenda items found under this criteria.</div>`;
         return;
       }
 
@@ -701,7 +680,6 @@
         const item = document.createElement('div');
         item.className = `todo-item ${todo.completed ? 'completed' : ''}`;
 
-        // Construct structure natively using standard table patterns matching design rules safely
         item.innerHTML = `
                     <div class="todo-cell-check">
                         <label class="check-container">
@@ -752,7 +730,6 @@
         .replace(/'/g, "&#039;");
     }
 
-    // Run Init execution cycles
     saveAndRender();
   </script>
 </body>

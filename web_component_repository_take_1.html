@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Component & HTML Snippet Repository</title>
+  <style>
+    :root {
+      /* Core Tones */
+      --md-sys-color-primary: hsl(100, 15%, 30%);
+      --md-sys-color-on-primary: hsl(100, 15%, 98%);
+      --md-sys-color-primary-container: hsl(100, 15%, 90%);
+
+      --md-sys-color-secondary: hsl(130, 10%, 40%);
+      --md-sys-color-on-secondary: #ffffff;
+
+      --md-sys-color-surface: hsl(100, 5%, 98%);
+      --md-sys-color-on-surface: hsl(100, 5%, 10%);
+      --md-sys-color-surface-variant: hsl(100, 10%, 90%);
+      --md-sys-color-on-surface-variant: hsl(100, 10%, 20%);
+
+      --md-sys-color-outline: hsl(100, 10%, 50%);
+
+      /* Highlight Tones (Muted/Pastel) */
+      --md-sys-color-highlight: hsl(280, 40%, 85%);
+      --md-sys-color-on-highlight: hsl(280, 40%, 20%);
+
+      /* Spacing (MD3 Expressive) */
+      --spacing-unit: 4px;
+      --radius-xs: 4px;
+      --radius-s: 8px;
+      --radius-m: 12px;
+      --radius-l: 16px;
+      --radius-xl: 28px;
+      --radius-full: 9999px;
+
+      --background: var(--md-sys-color-surface);
+      --text-main: var(--md-sys-color-on-surface);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text-main);
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      min-height: 100vh;
+    }
+
+    /* Sidebar navigation */
+    aside {
+      background-color: var(--md-sys-color-surface-variant);
+      padding: calc(var(--spacing-unit) * 6);
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--spacing-unit) * 4);
+      border-right: 1px solid var(--md-sys-color-outline);
+    }
+
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--md-sys-color-primary);
+      margin-bottom: calc(var(--spacing-unit) * 4);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      padding: calc(var(--spacing-unit) * 3) calc(var(--spacing-unit) * 4);
+      border-radius: var(--radius-full);
+      text-align: left;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--md-sys-color-on-surface-variant);
+      transition: background 0.2s;
+    }
+
+    .nav-btn:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .nav-btn.active {
+      background-color: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-primary);
+    }
+
+    /* Main Workspace */
+    main {
+      padding: calc(var(--spacing-unit) * 8);
+      overflow-y: auto;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .view-section {
+      display: none;
+    }
+
+    .view-section.active {
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--spacing-unit) * 6);
+    }
+
+    h2 {
+      font-size: 1.75rem;
+      color: var(--md-sys-color-primary);
+      font-weight: 400;
+    }
+
+    /* Inputs & Form Controls */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--spacing-unit) * 2);
+    }
+
+    label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    input,
+    textarea,
+    select {
+      padding: calc(var(--spacing-unit) * 3);
+      border: 1px solid var(--md-sys-color-outline);
+      border-radius: var(--radius-s);
+      background: var(--md-sys-color-surface);
+      color: var(--text-main);
+      font-size: 1rem;
+    }
+
+    textarea {
+      font-family: 'Courier New', Courier, monospace;
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      outline: 2px solid var(--md-sys-color-primary);
+    }
+
+    .repo-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: calc(var(--spacing-unit) * 4);
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      background-color: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+      border: none;
+      padding: calc(var(--spacing-unit) * 3) calc(var(--spacing-unit) * 5);
+      border-radius: var(--radius-full);
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: opacity 0.2s;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+    }
+
+    .btn-secondary {
+      background-color: var(--md-sys-color-secondary);
+      color: var(--md-sys-color-on-secondary);
+    }
+
+    .btn-danger {
+      background-color: hsl(0, 70%, 40%);
+      color: white;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--md-sys-color-outline);
+      color: var(--md-sys-color-primary);
+    }
+
+    /* Component Cards Grid */
+    .search-bar {
+      flex-grow: 1;
+      max-width: 400px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+      gap: calc(var(--spacing-unit) * 6);
+    }
+
+    .card {
+      background: var(--md-sys-color-surface);
+      border: 1px solid var(--md-sys-color-surface-variant);
+      border-radius: var(--radius-l);
+      padding: calc(var(--spacing-unit) * 5);
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--spacing-unit) * 3);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .card-tag {
+      background: var(--md-sys-color-highlight);
+      color: var(--md-sys-color-on-highlight);
+      padding: calc(var(--spacing-unit)) calc(var(--spacing-unit) * 3);
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .card-tag.native-html {
+      background: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-primary);
+    }
+
+    /* Live Preview Window Canvas */
+    .preview-box {
+      background: white;
+      border: 1px dashed var(--md-sys-color-outline);
+      border-radius: var(--radius-m);
+      padding: calc(var(--spacing-unit) * 4);
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .preview-box::before {
+      content: "Live Preview Canvas";
+      position: absolute;
+      top: 4px;
+      left: 6px;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      color: var(--md-sys-color-outline);
+      letter-spacing: 0.5px;
+    }
+
+    .preview-error {
+      color: hsl(0, 70%, 40%);
+      font-size: 0.8rem;
+      font-family: monospace;
+      white-space: pre-wrap;
+      width: 100%;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: calc(var(--spacing-unit) * 2);
+      margin-top: auto;
+    }
+
+    /* Layout splits */
+    .editor-split,
+    .boilerplate-layout {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: calc(var(--spacing-unit) * 6);
+    }
+
+    .sticky-preview {
+      position: sticky;
+      top: calc(var(--spacing-unit) * 4);
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--spacing-unit) * 4);
+      height: fit-content;
+    }
+
+    @media (max-width: 900px) {
+      body {
+        grid-template-columns: 1fr;
+      }
+
+      aside {
+        display: none;
+      }
+
+      .editor-split,
+      .boilerplate-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .code-container {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: calc(var(--spacing-unit) * 4);
+      border-radius: var(--radius-m);
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.85rem;
+      white-space: pre-wrap;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .copy-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--md-sys-color-on-surface);
+      color: var(--md-sys-color-surface);
+      padding: calc(var(--spacing-unit) * 3) calc(var(--spacing-unit) * 6);
+      border-radius: var(--radius-s);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: transform 0.3s, opacity 0.3s;
+      z-index: 1000;
+    }
+
+    .copy-toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .form-row {
+      display: flex;
+      gap: calc(var(--spacing-unit) * 4);
+    }
+
+    .form-row .form-group {
+      flex: 1;
+    }
+  </style>
+</head>
+
+<body>
+
+  <aside>
+    <div class="logo">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path
+          d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+        </path>
+        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+      </svg>
+      WC Sandbox
+    </div>
+    <button class="nav-btn active" onclick="switchView('repository')">My Library</button>
+    <button class="nav-btn" onclick="switchView('creator')">Add Snippet / Tag</button>
+    <button class="nav-btn" onclick="switchView('boilerplate')">Boilerplate Engine</button>
+    <button class="nav-btn" onclick="switchView('data-manager')">Backup / Migration</button>
+  </aside>
+
+  <main>
+
+    <section id="view-repository" class="view-section active">
+      <h2>Snippet Library</h2>
+      <div class="repo-controls">
+        <input type="text" id="search-input" class="search-bar"
+          placeholder="Filter elements by name, tag, or descriptions..." oninput="renderComponents()">
+        <div>
+          <button class="btn btn-outline" onclick="switchView('data-manager')">Import/Export JSON</button>
+        </div>
+      </div>
+      <div id="components-grid" class="grid">
+      </div>
+    </section>
+
+    <section id="view-creator" class="view-section">
+      <h2 id="form-title">Create Snippet Entry</h2>
+      <div class="editor-split">
+
+        <form id="component-form" onsubmit="saveComponent(event)">
+          <input type="hidden" id="comp-id">
+          <div class="form-row" style="margin-bottom: 16px;">
+            <div class="form-group">
+              <label for="comp-name">Component/Snippet Title</label>
+              <input type="text" id="comp-name" placeholder="e.g., Info Card Block" required>
+            </div>
+            <div class="form-group">
+              <label for="comp-tag">Type Identification Tag (Or Element Type)</label>
+              <input type="text" id="comp-tag" placeholder="e.g., div / custom-alert" required
+                oninput="updateLiveFormPreview()">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label for="comp-desc">Description Context</label>
+            <input type="text" id="comp-desc" placeholder="Briefly summarize what this layout chunk provides...">
+          </div>
+
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label for="comp-preview-html">HTML Markup Structure</label>
+            <textarea id="comp-preview-html" style="min-height: 120px;"
+              placeholder="e.g., &lt;div class='my-box'&gt;\n  &lt;p&gt;Paragraph item&lt;/p&gt;\n&lt;/div&gt;" required
+              oninput="updateLiveFormPreview()"></textarea>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label for="comp-css">Raw CSS Stylesheet (Scoped to Sandbox target)</label>
+            <textarea id="comp-css" style="min-height: 120px;"
+              placeholder="e.g., .my-box {\n  background: #f0f0f0;\n}\np {\n  color: purple;\n}"
+              oninput="updateLiveFormPreview()"></textarea>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 24px;">
+            <label for="comp-code">Optional Web Component JavaScript Logic (Leave blank for normal plain
+              templates)</label>
+            <textarea id="comp-code"
+              placeholder="class CustomCard extends HTMLElement { ... }\ncustomElements.define('custom-card', CustomCard);"
+              oninput="updateLiveFormPreview()"></textarea>
+          </div>
+
+          <div style="display:flex; gap: 12px;">
+            <button type="submit" class="btn">Save Snippet Asset</button>
+            <button type="button" class="btn btn-secondary" onclick="cancelEditing()">Cancel</button>
+          </div>
+        </form>
+
+        <div class="sticky-preview">
+          <label>Interactive Sandbox Preview</label>
+          <div class="preview-box" id="form-live-canvas" style="min-height: 250px; background: #ffffff;">
+          </div>
+          <div id="form-error-console" class="preview-error"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <section id="view-boilerplate" class="view-section">
+      <h2>Boilerplate Configurator</h2>
+      <div class="boilerplate-layout">
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div class="form-group">
+            <label for="bp-name">Class Name</label>
+            <input type="text" id="bp-name" value="CustomPill" oninput="generateBoilerplate()">
+          </div>
+          <div class="form-group">
+            <label for="bp-tag">Tag Name</label>
+            <input type="text" id="bp-tag" value="custom-pill" oninput="generateBoilerplate()">
+          </div>
+          <div class="form-group">
+            <label for="bp-shadow">Shadow DOM Setup Type</label>
+            <select id="bp-shadow" onchange="generateBoilerplate()">
+              <option value="open">open (Encapsulated Root Context)</option>
+              <option value="closed">closed</option>
+              <option value="none">None (Light global fallback tree context)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Features:</label>
+            <label style="font-weight: normal; display: flex; align-items: center; gap: 8px;">
+              <input type="checkbox" id="bp-observed" onchange="generateBoilerplate()" checked> Observe Target
+              Attributes
+            </label>
+            <label style="font-weight: normal; display: flex; align-items: center; gap: 8px;">
+              <input type="checkbox" id="bp-lifecycle" onchange="generateBoilerplate()" checked> Mount Lifecycle
+              Framework
+            </label>
+          </div>
+          <button class="btn btn-secondary" onclick="exportBoilerplateToCreator()">Send directly to Repository Creator
+            Form</button>
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 8px;">Generated Base Blueprint Code</label>
+          <div class="code-container" id="boilerplate-preview"></div>
+          <button class="btn" style="margin-top: 12px; width: 100%;" onclick="copyBoilerplate()">Copy Generated
+            Boilerplate String</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-data-manager" class="view-section">
+      <h2>Migration & Storage Portal</h2>
+      <p style="color: var(--md-sys-color-on-surface-variant); font-size: 0.95rem;">
+        Back up, migrate, or populate your local system web component registry using declarative valid JSON matrices.
+      </p>
+      <div class="form-group" style="margin-top: 12px;">
+        <label for="json-io-area">Raw Blueprint JSON Database Configuration Matrix</label>
+        <textarea id="json-io-area" style="min-height: 250px; font-family: monospace;"
+          placeholder="Paste repository tracking schema layout arrays here..."></textarea>
+      </div>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <button class="btn" onclick="generateBackupJSON()">Generate Current Export Backup</button>
+        <button class="btn btn-secondary" onclick="loadImportJSON()">Import & Override Local Repositories</button>
+        <button class="btn btn-outline" style="margin-left: auto;" onclick="downloadJSONFile()">Download file package
+          (.json)</button>
+      </div>
+    </section>
+
+  </main>
+
+  <div id="toast" class="copy-toast">Action Completed!</div>
+
+  <script>
+    // Seed database populated with hybrid raw layout chunks containing embedded custom target CSS properties
+    const coreSeed = [
+      {
+        id: "101",
+        name: "Reusable Callout Banner",
+        tag: "div / p Layout",
+        desc: "A plain HTML boilerplate snippet featuring nested tags styled through scoped sandbox definitions.",
+        previewHtml: "<div class=\"callout-wrapper\">\n  <p class=\"callout-title\">Attention Required</p>\n  <p class=\"callout-body\">This snippet uses raw custom CSS to style the nested elements safely.</p>\n</div>",
+        css: ".callout-wrapper {\n  padding: 16px;\n  border-left: 5px solid var(--md-sys-color-primary, #4a5d4e);\n  background: #f4f6f4;\n  border-radius: 4px;\n}\n.callout-title {\n  font-weight: bold;\n  color: #222;\n  margin-bottom: 4px;\n}\n.callout-body {\n  font-size: 0.9rem;\n  color: #555;\n}",
+        code: ""
+      },
+      {
+        id: "102",
+        name: "Context Highlight Badge",
+        tag: "highlight-badge",
+        desc: "An inline status accent custom web component utilizing explicit highlight tokens.",
+        previewHtml: "<highlight-badge>Dynamic Custom Tag Node</highlight-badge>",
+        css: "",
+        code: `class HighlightBadge extends HTMLElement {\n  constructor() {\n    super();\n    this.attachShadow({ mode: 'open' });\n    this.shadowRoot.innerHTML = \`\n      <style>\n        :host { display: inline-block; }\n        span { background: var(--md-sys-color-highlight, #e0b0ff); color: var(--md-sys-color-on-highlight, #200030); padding: 4px 10px; border-radius: 8px; font-weight: bold; font-size: 0.8rem; }\n      </style>\n      <span><slot></slot></span>\n    \`;\n  }\n}\nif(!customElements.get('highlight-badge')) {\n  customElements.define('highlight-badge', HighlightBadge);\n}`
+      }
+    ];
+
+    let components = JSON.parse(localStorage.getItem('wc-sandbox-repo')) || coreSeed;
+    if (!localStorage.getItem('wc-sandbox-repo')) {
+      localStorage.setItem('wc-sandbox-repo', JSON.stringify(components));
+    }
+
+    let debounceTimer;
+
+    function switchView(viewName) {
+      document.querySelectorAll('.view-section').forEach(view => view.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+
+      document.getElementById(`view-${viewName}`).classList.add('active');
+      const targetBtn = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.getAttribute('onclick').includes(viewName));
+      if (targetBtn) targetBtn.classList.add('active');
+
+      if (viewName === 'repository') renderComponents();
+      if (viewName === 'boilerplate') generateBoilerplate();
+      if (viewName === 'creator') updateLiveFormPreview();
+    }
+
+    // Render Main Grid Repositories
+    function renderComponents() {
+      const grid = document.getElementById('components-grid');
+      const search = document.getElementById('search-input').value.toLowerCase();
+      grid.innerHTML = '';
+
+      const filtered = components.filter(c =>
+        c.name.toLowerCase().includes(search) ||
+        c.tag.toLowerCase().includes(search) ||
+        (c.desc && c.desc.toLowerCase().includes(search))
+      );
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--md-sys-color-outline); margin-top: 40px;">No matching items cataloged.</p>`;
+        return;
+      }
+
+      filtered.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        const isNativeHtml = !item.code || item.code.trim() === "";
+        const typeLabelClass = isNativeHtml ? 'card-tag native-html' : 'card-tag';
+        const labelText = isNativeHtml ? `HTML Snippet (${escapeHtml(item.tag)})` : `&lt;${item.tag}&gt;`;
+
+        card.innerHTML = `
+                    <div class="card-header">
+                        <h3>${escapeHtml(item.name)}</h3>
+                        <div class="${typeLabelClass}">${labelText}</div>
+                    </div>
+                    <p>${escapeHtml(item.desc || 'No descriptions declared.')}</p>
+                    
+                    <div class="preview-box" id="preview-container-${item.id}"></div>
+
+                    <div class="card-actions">
+                        <button class="btn" onclick="copySnippet('${item.id}')">Copy Payload</button>
+                        <button class="btn btn-secondary" onclick="editComponent('${item.id}')">Edit</button>
+                        <button class="btn btn-danger" style="margin-left:auto" onclick="deleteComponent('${item.id}')">Delete</button>
+                    </div>
+                `;
+        grid.appendChild(card);
+
+        try {
+          // If custom element code exists, register it globally
+          if (!isNativeHtml) {
+            const scriptNode = document.createElement('script');
+            scriptNode.textContent = item.code;
+            document.body.appendChild(scriptNode);
+            document.body.removeChild(scriptNode);
+          }
+
+          const canvasTarget = document.getElementById(`preview-container-${item.id}`);
+          if (canvasTarget) {
+            // Inject clean content. If CSS is supplied to raw markup snippets, it gets prepended with an internal explicit element identifier selector to enforce scoping
+            if (isNativeHtml && item.css && item.css.trim() !== "") {
+              canvasTarget.innerHTML = `<style>${scopeCss(item.css, `#preview-container-${item.id}`)}</style>${item.previewHtml}`;
+            } else {
+              canvasTarget.innerHTML = item.previewHtml;
+            }
+          }
+        } catch (err) {
+          const canvasTarget = document.getElementById(`preview-container-${item.id}`);
+          if (canvasTarget) canvasTarget.innerHTML = `<span style="color:red; font-size:0.75rem;">Compilation rendering error</span>`;
+        }
+      });
+    }
+
+    // Live Real-Time Debounced Form Mirroring Pipeline
+    function updateLiveFormPreview() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        const code = document.getElementById('comp-code').value;
+        const markup = document.getElementById('comp-preview-html').value;
+        const css = document.getElementById('comp-css').value;
+        const canvas = document.getElementById('form-live-canvas');
+        const errorLog = document.getElementById('form-error-console');
+
+        errorLog.innerText = '';
+
+        if (!markup.trim()) {
+          canvas.innerHTML = '<span style="color:var(--md-sys-color-outline); font-size:0.85rem;">Awaiting markup layout payload inputs...</span>';
+          return;
+        }
+
+        try {
+          if (code.trim() !== "") {
+            const dynamicScript = document.createElement('script');
+            dynamicScript.textContent = code;
+            document.body.appendChild(dynamicScript);
+            document.body.removeChild(dynamicScript);
+          }
+
+          // Enforce structural CSS sandbox block isolation inside active editing container canvas
+          if (css.trim() !== "") {
+            canvas.innerHTML = `<style>${scopeCss(css, '#form-live-canvas')}</style>${markup}`;
+          } else {
+            canvas.innerHTML = markup;
+          }
+        } catch (err) {
+          errorLog.innerText = `Live Evaluation Notice: ${err.message}`;
+        }
+      }, 250);
+    }
+
+    // Helper engine to scope global raw stylesheets inside assigned sandbox node contexts
+    function scopeCss(cssString, cssContainerSelector) {
+      return cssString.replace(/([^\r\n,{}]+)(?=\s*\{)/g, (match) => {
+        const parts = match.split(',').map(selector => {
+          const cleanSelector = selector.trim();
+          if (cleanSelector === ':host') return cssContainerSelector;
+          return `${cssContainerSelector} ${cleanSelector}`;
+        });
+        return parts.join(', ');
+      });
+    }
+
+    function saveComponent(e) {
+      e.preventDefault();
+      const id = document.getElementById('comp-id').value;
+      const name = document.getElementById('comp-name').value;
+      const tag = document.getElementById('comp-tag').value;
+      const desc = document.getElementById('comp-desc').value;
+      const previewHtml = document.getElementById('comp-preview-html').value;
+      const css = document.getElementById('comp-css').value;
+      const code = document.getElementById('comp-code').value;
+
+      if (id) {
+        components = components.map(c => c.id === id ? { id, name, tag, desc, previewHtml, css, code } : c);
+      } else {
+        components.push({ id: Date.now().toString(), name, tag, desc, previewHtml, css, code });
+      }
+
+      localStorage.setItem('wc-sandbox-repo', JSON.stringify(components));
+      clearForm();
+      switchView('repository');
+    }
+
+    function editComponent(id) {
+      const entry = components.find(c => c.id === id);
+      if (!entry) return;
+
+      document.getElementById('comp-id').value = entry.id;
+      document.getElementById('comp-name').value = entry.name;
+      document.getElementById('comp-tag').value = entry.tag;
+      document.getElementById('comp-desc').value = entry.desc || '';
+      document.getElementById('comp-preview-html').value = entry.previewHtml || '';
+      document.getElementById('comp-css').value = entry.css || '';
+      document.getElementById('comp-code').value = entry.code || '';
+
+      document.getElementById('form-title').innerText = `Edit Snippet: ${entry.name}`;
+      switchView('creator');
+    }
+
+    function cancelEditing() {
+      clearForm();
+      switchView('repository');
+    }
+
+    function clearForm() {
+      document.getElementById('component-form').reset();
+      document.getElementById('comp-id').value = '';
+      document.getElementById('form-title').innerText = "Create Snippet Entry";
+      document.getElementById('form-live-canvas').innerHTML = '';
+      document.getElementById('form-error-console').innerText = '';
+    }
+
+    function deleteComponent(id) {
+      if (confirm('Are you positive you want to remove this compiled layout entry?')) {
+        components = components.filter(c => c.id !== id);
+        localStorage.setItem('wc-sandbox-repo', JSON.stringify(components));
+        renderComponents();
+      }
+    }
+
+    function copySnippet(id) {
+      const entry = components.find(c => c.id === id);
+      if (entry) {
+        const isNativeHtml = !entry.code || entry.code.trim() === "";
+        let bundlePayload = "";
+
+        if (isNativeHtml) {
+          // Combine layout rules into a single block for plain code extraction instances
+          bundlePayload = (entry.css && entry.css.trim() !== "")
+            ? `<style>\n${entry.css}\n</style>\n${entry.previewHtml}`
+            : entry.previewHtml;
+        } else {
+          bundlePayload = entry.code;
+        }
+
+        navigator.clipboard.writeText(bundlePayload);
+        showToast(`Asset payload package transferred to your clipboard.`);
+      }
+    }
+
+    // Backup and Migration File Pipelines
+    function generateBackupJSON() {
+      document.getElementById('json-io-area').value = JSON.stringify(components, null, 2);
+      showToast('JSON package schema layout generated successfully.');
+    }
+
+    function loadImportJSON() {
+      const rawAreaStr = document.getElementById('json-io-area').value;
+      try {
+        const parsedPayload = JSON.parse(rawAreaStr);
+        if (Array.isArray(parsedPayload)) {
+          components = parsedPayload;
+          localStorage.setItem('wc-sandbox-repo', JSON.stringify(components));
+          showToast('Data storage updated from external matrix tracking source.');
+          switchView('repository');
+        } else {
+          alert('Configuration structural data package targets must be structured as a flat array.');
+        }
+      } catch (e) {
+        alert('Parsing verification configuration failed check match parameters: ' + e.message);
+      }
+    }
+
+    function downloadJSONFile() {
+      const cleanTextBlob = JSON.stringify(components, null, 2);
+      const dataUriBlob = 'data:application/json;charset=utf-8,' + encodeURIComponent(cleanTextBlob);
+      const setupDownloadAnchor = document.createElement('a');
+      setupDownloadAnchor.setAttribute('href', dataUriBlob);
+      setupDownloadAnchor.setAttribute('download', `snippet-repository-export-${new Date().toISOString().slice(0, 10)}.json`);
+      document.body.appendChild(setupDownloadAnchor);
+      setupDownloadAnchor.click();
+      document.body.removeChild(setupDownloadAnchor);
+    }
+
+    // Boilerplate dynamic script formatting processes
+    function generateBoilerplate() {
+      const className = document.getElementById('bp-name').value || 'MyComponent';
+      const tagName = document.getElementById('bp-tag').value || 'my-component';
+      const shadowMode = document.getElementById('bp-shadow').value;
+      const observeAttr = document.getElementById('bp-observed').checked;
+      const lifecycle = document.getElementById('bp-lifecycle').checked;
+
+      let code = `class ${className} extends HTMLElement {\n`;
+      code += `  constructor() {\n    super();\n`;
+      if (shadowMode !== 'none') {
+        code += `    this.attachShadow({ mode: '${shadowMode}' });\n`;
+      }
+      code += `  }\n`;
+
+      if (observeAttr) {
+        code += `\n  static get observedAttributes() {\n    return ['status'];\n  }\n\n`;
+        code += `  attributeChangedCallback(name, oldVal, newVal) {\n    if (oldVal !== newVal) this.render();\n  }\n`;
+      }
+
+      if (lifecycle) {
+        code += `\n  connectedCallback() {\n    this.render();\n  }\n`;
+      }
+
+      code += `\n  render() {\n`;
+      if (shadowMode !== 'none') {
+        code += `    this.shadowRoot.innerHTML = \\\`\n      <style>\n        :host { display: inline-block; }\n        div { padding: 12px; border: 2px solid var(--md-sys-color-primary);\n      </style>\n      <div>Shadow Root Container: <slot></slot></div>\n    \\\`;\n`;
+      } else {
+        code += `    this.innerHTML = \`<div style="padding:12px; border:1px solid teal">Light DOM Content Rendered</div>\`;\n`;
+      }
+      code += `  }\n`;
+      code += `}\n\nif (!customElements.get('${tagName}')) {\n  customElements.define('${tagName}', ${className});\n}`;
+
+      document.getElementById('boilerplate-preview').innerText = code;
+    }
+
+    function copyBoilerplate() {
+      navigator.clipboard.writeText(document.getElementById('boilerplate-preview').innerText);
+      showToast('Boilerplate configuration copied.');
+    }
+
+    function exportBoilerplateToCreator() {
+      clearForm();
+      document.getElementById('comp-name').value = document.getElementById('bp-name').value;
+      document.getElementById('comp-tag').value = document.getElementById('bp-tag').value;
+      document.getElementById('comp-desc').value = `Scaffold framework template configuration tracking block.`;
+      document.getElementById('comp-preview-html').value = `<${document.getElementById('bp-tag').value}>Sample Text Element Context</${document.getElementById('bp-tag').value}>`;
+      document.getElementById('comp-code').value = document.getElementById('boilerplate-preview').innerText;
+      switchView('creator');
+    }
+
+    function showToast(msg) {
+      const element = document.getElementById('toast');
+      element.innerText = msg;
+      element.classList.add('show');
+      setTimeout(() => element.classList.remove('show'), 3000);
+    }
+
+    function escapeHtml(text) {
+      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    // Initialize execution setup routing
+    renderComponents();
+  </script>
+</body>
+
+</html>
