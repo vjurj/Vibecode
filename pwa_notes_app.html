@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Minimal Notes</title>
+
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="MinNotes">
+  <link rel="apple-touch-icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2228%22 fill=%22hsl(100, 15%, 30%)%22/><text y=%2265%22 x=%2223%22 fill=%22white%22 font-size=%2250%22 font-weight=%22bold%22 font-family=%22sans-serif%22>N</text></svg>">
+
+  <link rel="manifest"
+    href="data:application/json;base64,ewogICJuYW1lIjogIk1pbmltYWwgTm90ZXMgUE9BIiwKICAic2hvcnRfbmFtZSI6ICJNaW5Ob3RlcyIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICJoc2woMTAwLCA1JSwgOTglKSIsCiAgInRoZW1lX2NvbG9yIjogImhzbCgxMDAsIDE1JSwgMzAlKSIsCiAgImljb25zIjogWwogICAgewogICAgICAic3JjIjogImRhdGE6aW1hZ2Uvc3ZnK3htbCw8c3ZnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zycgdmlld0JveD0nMCAwIDEwMCAxMDAnPjxyZWN0IHdpZHRoPScxMDAnJyBoZWlnaHQ9JzEwMCUnIHJ4PScyOCcgZmlsbD0naHNsKDEwMCwgMTUlLCAzMCUpJy8+PHRleHQgeT0nNjUnIHg9JzIzJyBmaWxsPSd3aGl0ZScgZm9udC1zaXplPSc1MCcgZm9udC13ZWlnaHQ9J2JvbGQnIGZvbnQtZmFtaWx5PSdzYW5zLXNlcmlmJz5OPC90ZXh0Pjwvc3ZnPiIsCiAgICAgICJzaXplcyI6ICI1MTJ4NTEyIiwKICAgICAgInR5cGUiOiAiaW1hZ2Uvc3ZnK3htbCIKICAgIH0KICBdCn0=">
+
+  <style>
+    :root {
+      /* Core Tones */
+      --md-sys-color-primary: hsl(100, 15%, 30%);
+      --md-sys-color-on-primary: hsl(100, 15%, 98%);
+      --md-sys-color-primary-container: hsl(100, 15%, 90%);
+
+      --md-sys-color-secondary: hsl(130, 10%, 40%);
+      --md-sys-color-on-secondary: #ffffff;
+
+      --md-sys-color-surface: hsl(100, 5%, 98%);
+      --md-sys-color-on-surface: hsl(100, 5%, 10%);
+      --md-sys-color-surface-variant: hsl(100, 10%, 90%);
+      --md-sys-color-on-surface-variant: hsl(100, 10%, 20%);
+
+      --md-sys-color-outline: hsl(100, 10%, 50%);
+
+      /* Highlight Tones (Muted/Pastel) */
+      --md-sys-color-highlight: hsl(280, 40%, 85%);
+      --md-sys-color-on-highlight: hsl(280, 40%, 20%);
+
+      /* Spacing (MD3 Expressive) */
+      --spacing-unit: 4px;
+      --radius-xs: 4px;
+      --radius-s: 8px;
+      --radius-m: 12px;
+      --radius-l: 16px;
+      --radius-xl: 28px;
+      --radius-full: 9999px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--md-sys-color-surface);
+      color: var(--md-sys-color-on-surface);
+      padding: calc(var(--spacing-unit) * 4);
+      padding-top: calc(env(safe-area-inset-top) + calc(var(--spacing-unit) * 4));
+      padding-bottom: calc(env(safe-area-inset-bottom) + calc(var(--spacing-unit) * 24));
+      min-height: 100vh;
+    }
+
+    header {
+      margin-bottom: calc(var(--spacing-unit) * 6);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--md-sys-color-primary);
+    }
+
+    /* Search Bar */
+    .search-container {
+      margin-bottom: calc(var(--spacing-unit) * 4);
+    }
+
+    .search-input {
+      width: 100%;
+      padding: calc(var(--spacing-unit) * 3) calc(var(--spacing-unit) * 4);
+      border: 1px solid var(--md-sys-color-outline);
+      border-radius: var(--radius-full);
+      background-color: var(--md-sys-color-surface);
+      color: var(--md-sys-color-on-surface);
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 2px var(--md-sys-color-primary-container);
+    }
+
+    /* Notes Grid */
+    .notes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: calc(var(--spacing-unit) * 4);
+    }
+
+    .note-card {
+      background-color: var(--md-sys-color-surface-variant);
+      color: var(--md-sys-color-on-surface-variant);
+      padding: calc(var(--spacing-unit) * 4);
+      border-radius: var(--radius-l);
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 140px;
+    }
+
+    .note-card:active {
+      transform: scale(0.98);
+    }
+
+    .note-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: calc(var(--spacing-unit) * 2);
+      color: var(--md-sys-color-primary);
+      word-break: break-word;
+    }
+
+    .note-body {
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      flex-grow: 1;
+    }
+
+    .note-footer {
+      margin-top: calc(var(--spacing-unit) * 3);
+      font-size: 11px;
+      opacity: 0.7;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Floating Action Button (FAB) */
+    .fab {
+      position: fixed;
+      bottom: calc(env(safe-area-inset-bottom) + calc(var(--spacing-unit) * 6));
+      right: calc(var(--spacing-unit) * 6);
+      background-color: var(--md-sys-color-highlight);
+      color: var(--md-sys-color-on-highlight);
+      border: none;
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-xl);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      cursor: pointer;
+      transition: transform 0.1s;
+      z-index: 99;
+    }
+
+    .fab:active {
+      transform: scale(0.9);
+    }
+
+    /* Modal Overlay & Sheet */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.4);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-sheet {
+      background-color: var(--md-sys-color-surface);
+      width: 100%;
+      max-width: 600px;
+      border-top-left-radius: var(--radius-xl);
+      border-top-right-radius: var(--radius-xl);
+      padding: calc(var(--spacing-unit) * 6);
+      padding-bottom: calc(env(safe-area-inset-bottom) + calc(var(--spacing-unit) * 6));
+      box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
+      animation: slideUp 0.25s ease-out;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(100%);
+      }
+
+      to {
+        transform: translateY(0);
+      }
+    }
+
+    .modal-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--spacing-unit) * 3);
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+
+    .modal-title-input {
+      font-size: 20px;
+      font-weight: 600;
+      border: none;
+      background: transparent;
+      color: var(--md-sys-color-on-surface);
+      outline: none;
+      padding: var(--spacing-unit) 0;
+      border-bottom: 1px solid transparent;
+    }
+
+    .modal-title-input:focus {
+      border-bottom-color: var(--md-sys-color-outline);
+    }
+
+    .modal-body-input {
+      font-size: 16px;
+      border: none;
+      background: transparent;
+      color: var(--md-sys-color-on-surface);
+      outline: none;
+      resize: none;
+      min-height: 200px;
+      flex-grow: 1;
+      font-family: inherit;
+      line-height: 1.6;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: calc(var(--spacing-unit) * 4);
+    }
+
+    .btn {
+      padding: calc(var(--spacing-unit) * 2.5) calc(var(--spacing-unit) * 5);
+      border-radius: var(--radius-full);
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-text {
+      background: transparent;
+      color: var(--md-sys-color-primary);
+    }
+
+    .btn-text-danger {
+      background: transparent;
+      color: #ba1a1a;
+    }
+
+    .btn-filled {
+      background-color: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+    }
+
+    .empty-state {
+      text-align: center;
+      color: var(--md-sys-color-outline);
+      margin-top: calc(var(--spacing-unit) * 16);
+      font-size: 16px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>Notes</h1>
+  </header>
+
+  <div class="search-container">
+    <input type="text" id="searchInput" class="search-input" placeholder="Search notes...">
+  </div>
+
+  <div id="emptyState" class="empty-state">No notes found. Tap '+' to create one!</div>
+  <div id="notesGrid" class="notes-grid"></div>
+
+  <button class="fab" id="addFab" aria-label="Add Note">+</button>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-sheet">
+      <div class="modal-inputs">
+        <input type="text" id="noteTitleInput" class="modal-title-input" placeholder="Title" autocomplete="off">
+        <textarea id="noteBodyInput" class="modal-body-input" placeholder="Note text..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <div>
+          <button class="btn btn-text-danger" id="deleteNoteBtn" style="display: none;">Delete</button>
+          <button class="btn btn-text" id="cancelNoteBtn">Cancel</button>
+        </div>
+        <button class="btn btn-filled" id="saveNoteBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- State Management ---
+    let notes = JSON.parse(localStorage.getItem('min_notes_pwa_data')) || [];
+    let currentEditingId = null;
+
+    // --- DOM Elements ---
+    const notesGrid = document.getElementById('notesGrid');
+    const emptyState = document.getElementById('emptyState');
+    const searchInput = document.getElementById('searchInput');
+    const addFab = document.getElementById('addFab');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const noteTitleInput = document.getElementById('noteTitleInput');
+    const noteBodyInput = document.getElementById('noteBodyInput');
+    const saveNoteBtn = document.getElementById('saveNoteBtn');
+    const cancelNoteBtn = document.getElementById('cancelNoteBtn');
+    const deleteNoteBtn = document.getElementById('deleteNoteBtn');
+
+    // --- Render System ---
+    function renderNotes(filterText = '') {
+      notesGrid.innerHTML = '';
+
+      const filteredNotes = notes.filter(note =>
+        note.title.toLowerCase().includes(filterText.toLowerCase()) ||
+        note.body.toLowerCase().includes(filterText.toLowerCase())
+      );
+
+      if (filteredNotes.length === 0) {
+        emptyState.style.display = 'block';
+        return;
+      }
+      emptyState.style.display = 'none';
+
+      // Sort by last modified date descending
+      filteredNotes.sort((a, b) => b.updatedAt - a.updatedAt);
+
+      filteredNotes.forEach(note => {
+        const card = document.createElement('div');
+        card.className = 'note-card';
+        card.addEventListener('click', () => openModal(note.id));
+
+        const dateStr = new Date(note.updatedAt).toLocaleDateString(undefined, {
+          month: 'short',
+          day: 'numeric'
+        });
+
+        card.innerHTML = `
+                    <div>
+                        <div class="note-title">${escapeHTML(note.title || 'Untitled')}</div>
+                        <div class="note-body">${escapeHTML(note.body || '')}</div>
+                    </div>
+                    <div class="note-footer">
+                        <span>${dateStr}</span>
+                    </div>
+                `;
+        notesGrid.appendChild(card);
+      });
+    }
+
+    function saveToStorage() {
+      localStorage.setItem('min_notes_pwa_data', JSON.stringify(notes));
+      renderNotes(searchInput.value);
+    }
+
+    function escapeHTML(str) {
+      return str.replace(/[&<>'"]/g,
+        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+      );
+    }
+
+    // --- Modal Operations ---
+    function openModal(noteId = null) {
+      currentEditingId = noteId;
+      if (noteId) {
+        const note = notes.find(n => n.id === noteId);
+        noteTitleInput.value = note.title;
+        noteBodyInput.value = note.body;
+        deleteNoteBtn.style.display = 'inline-block';
+      } else {
+        noteTitleInput.value = '';
+        noteBodyInput.value = '';
+        deleteNoteBtn.style.display = 'none';
+      }
+      modalOverlay.classList.add('active');
+      noteBodyInput.focus();
+    }
+
+    function closeModal() {
+      modalOverlay.classList.remove('active');
+      currentEditingId = null;
+    }
+
+    // --- Event Listeners ---
+    addFab.addEventListener('click', () => openModal());
+    cancelNoteBtn.addEventListener('click', closeModal);
+
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) closeModal();
+    });
+
+    saveNoteBtn.addEventListener('click', () => {
+      const title = noteTitleInput.value.trim();
+      const body = noteBodyInput.value.trim();
+
+      if (!title && !body) {
+        closeModal();
+        return;
+      }
+
+      if (currentEditingId) {
+        // Update
+        notes = notes.map(n => n.id === currentEditingId ? {
+          ...n, title, body, updatedAt: Date.now()
+        } : n);
+      } else {
+        // Create
+        notes.push({
+          id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
+          title,
+          body,
+          updatedAt: Date.now()
+        });
+      }
+
+      saveToStorage();
+      closeModal();
+    });
+
+    deleteNoteBtn.addEventListener('click', () => {
+      if (currentEditingId && confirm('Delete this note?')) {
+        notes = notes.filter(n => n.id !== currentEditingId);
+        saveToStorage();
+        closeModal();
+      }
+    });
+
+    searchInput.addEventListener('input', (e) => {
+      renderNotes(e.target.value);
+    });
+
+    // --- Initial Boot ---
+    renderNotes();
+
+    // --- Service Worker Implementation for Offline Capability ---
+    if ('serviceWorker' in navigator) {
+      const swCode = `
+                const CACHE_NAME = 'min-notes-v1';
+                self.addEventListener('install', (e) => {
+                    e.waitUntil(
+                        caches.open(CACHE_NAME).then((cache) => {
+                            return cache.addAll(['/', './index.html']);
+                        })
+                    );
+                });
+                self.addEventListener('fetch', (e) => {
+                    e.respondWith(
+                        caches.match(e.request).then((res) => res || fetch(e.request))
+                    );
+                });
+            `;
+      const blob = new Blob([swCode], { type: 'application/javascript' });
+      const swUrl = URL.createObjectURL(blob);
+      navigator.serviceWorker.register(swUrl).catch(() => {
+        // Fail silently if running on an environment without strict HTTPS setup
+      });
+    }
+  </script>
+</body>
+
+</html>
