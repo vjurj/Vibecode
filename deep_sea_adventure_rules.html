@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Board Game Rulebook Template</title>
+    <style>
+        :root { 
+            /* Core Tones */ 
+            --md-sys-color-primary: hsl(100, 15%, 30%); 
+            --md-sys-color-on-primary: hsl(100, 15%, 98%); 
+            --md-sys-color-primary-container: hsl(100, 15%, 90%); 
+             
+            --md-sys-color-secondary: hsl(130, 10%, 40%); 
+            --md-sys-color-on-secondary: #ffffff; 
+             
+            --md-sys-color-surface: hsl(100, 5%, 98%); 
+            --md-sys-color-on-surface: hsl(100, 5%, 10%); 
+            --md-sys-color-surface-variant: hsl(100, 10%, 90%); 
+            --md-sys-color-on-surface-variant: hsl(100, 10%, 20%); 
+             
+            --md-sys-color-outline: hsl(100, 10%, 50%); 
+             
+            /* Highlight Tones (Muted/Pastel) */ 
+            --md-sys-color-highlight: hsl(280, 40%, 85%); 
+            --md-sys-color-on-highlight: hsl(280, 40%, 20%); 
+
+            /* Spacing (MD3 Expressive) */ 
+            --spacing-unit: 4px; 
+            --radius-xs: 4px; 
+            --radius-s: 8px; 
+            --radius-m: 12px; 
+            --radius-l: 16px; 
+            --radius-xl: 28px; 
+            --radius-full: 9999px; 
+        }
+
+        /* Reset & Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--md-sys-color-surface);
+            color: var(--md-sys-color-on-surface);
+            line-height: 1.6;
+            padding-bottom: calc(10 * var(--spacing-unit));
+        }
+
+        /* Layout Container */
+        .app-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: calc(6 * var(--spacing-unit));
+            padding: calc(4 * var(--spacing-unit));
+        }
+
+        /* Header / Hero */
+        header {
+            grid-column: 1 / -1;
+            background-color: var(--md-sys-color-primary-container);
+            color: var(--md-sys-color-on-surface-variant);
+            padding: calc(8 * var(--spacing-unit));
+            border-radius: var(--radius-l);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: calc(4 * var(--spacing-unit));
+            margin-bottom: calc(4 * var(--spacing-unit));
+        }
+
+        .game-title h1 {
+            font-size: 2.5rem;
+            color: var(--md-sys-color-primary);
+            line-height: 1.2;
+        }
+
+        .game-title p {
+            font-style: italic;
+            margin-top: calc(1 * var(--spacing-unit));
+        }
+
+        /* PDF Button styling */
+        .btn-pdf {
+            display: inline-flex;
+            align-items: center;
+            gap: calc(2 * var(--spacing-unit));
+            background-color: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+            padding: calc(3 * var(--spacing-unit)) calc(6 * var(--spacing-unit));
+            border-radius: var(--radius-full);
+            text-decoration: none;
+            font-weight: bold;
+            transition: opacity 0.2s ease, transform 0.1s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-pdf:hover {
+            opacity: 0.9;
+        }
+
+        .btn-pdf:active {
+            transform: scale(0.98);
+        }
+
+        /* Sidebar Navigation */
+        aside {
+            position: sticky;
+            top: calc(4 * var(--spacing-unit));
+            height: fit-content;
+            background-color: var(--md-sys-color-surface-variant);
+            padding: calc(4 * var(--spacing-unit));
+            border-radius: var(--radius-m);
+        }
+
+        aside h2 {
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: calc(3 * var(--spacing-unit));
+            color: var(--md-sys-color-on-surface-variant);
+        }
+
+        aside ul {
+            list-style: none;
+        }
+
+        aside li {
+            margin-bottom: calc(2 * var(--spacing-unit));
+        }
+
+        aside a {
+            color: var(--md-sys-color-on-surface-variant);
+            text-decoration: none;
+            display: block;
+            padding: calc(1.5 * var(--spacing-unit)) calc(2 * var(--spacing-unit));
+            border-radius: var(--radius-s);
+            transition: background-color 0.2s;
+        }
+
+        aside a:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        /* Active sidebar element state controlled by JS */
+        aside a.active {
+            background-color: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+        }
+
+        /* Main Content Rules Area */
+        main {
+            display: flex;
+            flex-direction: column;
+            gap: calc(8 * var(--spacing-unit));
+        }
+
+        section {
+            scroll-margin-top: calc(4 * var(--spacing-unit)); /* Prevents header overlap when jumping to anchor */
+            background: #ffffff;
+            padding: calc(6 * var(--spacing-unit));
+            border-radius: var(--radius-m);
+            border: 1px solid var(--md-sys-color-surface-variant);
+        }
+
+        section h2 {
+            color: var(--md-sys-color-primary);
+            border-bottom: 2px solid var(--md-sys-color-primary-container);
+            padding-bottom: calc(2 * var(--spacing-unit));
+            margin-bottom: calc(4 * var(--spacing-unit));
+        }
+
+        /* Components & Game Metadata Metadata */
+        .game-meta {
+            display: flex;
+            gap: calc(4 * var(--spacing-unit));
+            margin-bottom: calc(4 * var(--spacing-unit));
+            flex-wrap: wrap;
+        }
+
+        .meta-badge {
+            background-color: var(--md-sys-color-surface-variant);
+            padding: calc(1 * var(--spacing-unit)) calc(3 * var(--spacing-unit));
+            border-radius: var(--radius-full);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Callout Box for Important Rules/Notes */
+        .callout-box {
+            background-color: var(--md-sys-color-highlight);
+            color: var(--md-sys-color-on-highlight);
+            padding: calc(4 * var(--spacing-unit));
+            border-radius: var(--radius-m);
+            margin: calc(4 * var(--spacing-unit)) 0;
+            border-left: 6px solid var(--md-sys-color-primary);
+        }
+
+        .callout-box strong {
+            display: block;
+            margin-bottom: calc(1 * var(--spacing-unit));
+        }
+
+        /* Component Grid Example */
+        .component-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: calc(3 * var(--spacing-unit));
+            margin-top: calc(3 * var(--spacing-unit));
+        }
+
+        .component-item {
+            border: 1px solid var(--md-sys-color-outline);
+            padding: calc(3 * var(--spacing-unit));
+            border-radius: var(--radius-s);
+            background-color: var(--md-sys-color-surface);
+        }
+
+        /* Allow the final section to scroll to the top of the screen */
+        main section:last-child {
+            margin-bottom: 80vh; 
+        }
+
+        /* Responsive Breakpoint for Mobile Screens */
+        @media (max-width: 768px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+            aside {
+                position: relative;
+                top: 0;
+            }
+            header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <header>
+            <div class="game-title">
+                <h1>Deep Sea Adventure</h1>
+                <p></p>
+            </div>
+           <a href="https://vjurj.github.io/Vibecode/deep_sea_rules.pdf" target="_blank" class="btn-pdf">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+        <polyline points="7 10 12 15 17 10"></polyline>
+        <line x1="12" y1="15" x2="12" y2="3"></line>
+    </svg>
+    Download PDF Rules
+</a>
+        </header>
+
+        <aside>
+            <h2>Rulebook Sections</h2>
+            <nav id="sidebar-nav">
+                <ul>
+                    <!-- <li><a href="#overview" class="active">Game Overview</a></li>
+                    <li><a href="#components">Components</a></li>
+                    <li><a href="#setup">Setup Guide</a></li> -->
+                    <li><a href="#gameplay">How to Play</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main>
+            <section id="gameplay">
+                <h2>How to Play</h2>
+                <p>The game is played over 3 rounds</p>
+                <p>At the beginning of each player's turn, reduce air by the amount of chips they hold. 
+                    Even if the counter reaches 0, the player is allowed to finish their turn. The 
+                    players that are already back at the submarine are not affected.
+                </p>
+                <p>Before rolling, you must declare the direction you are moving towards (the sea or 
+                    the submarine)</p>
+                <p>You may only declare once per round if you go back towards the submarine. You cannot
+                    revert this choice until the next round.
+                </p>
+                <p>When moving, subtract the number of chips from the dice roll. For example, a roll of
+                    4 with 2 chips means that you move 2 spaces (4 rolled - 2 chips = 2)
+                </p>
+                <p>Each player that has reached the submarine will score points for all of their chips</p>
+                <p>The players that have not reached the submarine will lose all of their chips. Those will be placed next to the chip furthest away from the submarine, in the next empty location. Discard them as stacks of 3 chips.</p>
+                <p>The discarded chip stacks count as 1 chip per stack for the purposes of decreasing air and spaces moved</p>
+                <p>At the end of each round, all empty chips will be discarded</p>
+                <p>The player farthest from the submarine will start the next round</p>
+
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const sections = document.querySelectorAll('main section');
+            const navLinks = document.querySelectorAll('#sidebar-nav a');
+
+            window.addEventListener('scroll', () => {
+                let currentSectionId = '';
+
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    // Triggers the shift slightly before the item hits the top boundary
+                    if (pageYOffset >= sectionTop - 60) {
+                        currentSectionId = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${currentSectionId}`) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
