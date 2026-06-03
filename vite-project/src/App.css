@@ -2,13 +2,13 @@
   /* Core Tones (Your Original Sage Green, Muted & Softened) */
   --md-sys-color-primary: hsl(100, 15%, 35%);          /* Muted Sage Accent */
   --md-sys-color-on-primary: hsl(100, 15%, 98%);
-  --md-sys-color-primary-container: hsl(100, 15%, 92%); /* Soft Sage Tint Tint */
+  --md-sys-color-primary-container: hsl(100, 15%, 92%); /* Soft Sage Tint */
 
   --md-sys-color-secondary: hsl(100, 10%, 45%);         /* Gentle Green-Gray */
   --md-sys-color-on-secondary: #ffffff;
 
   --md-sys-color-surface: hsl(100, 12%, 96%);          /* Creamy, Soft Gray-Green Surface */
-  --md-sys-color-on-surface: hsl(100, 10%, 25%);        /* Muted Charcoal Text (Low Contrast) */
+  --md-sys-color-on-surface: hsl(100, 10%, 25%);        /* Muted Charcoal Text */
   --md-sys-color-surface-variant: hsl(100, 8%, 91%);   /* Soft Secondary Background Tint */
   --md-sys-color-on-surface-variant: hsl(100, 10%, 30%);
 
@@ -18,29 +18,30 @@
   --md-sys-color-highlight: hsl(280, 25%, 90%);
   --md-sys-color-on-highlight: hsl(280, 20%, 40%);
 
-  /* Spacing Adjustments for Clean Grid System */
+  /* Spacing Adjustments */
   --spacing-unit: 8px;
-  --radius-sharp: 4px; /* Softened slightly for a warmer aesthetic */
+  --radius-sharp: 8px; /* Restored to your original sharp radius */
 }
 
 .generator-body-wrapper {
-  background-color: hsl(100, 10%, 93%); /* Calming, low-contrast outer background */
+  background-color: hsl(100, 10%, 93%); 
   color: var(--md-sys-color-on-surface);
-  padding: calc(var(--spacing-unit) * 4);
+  padding: calc(var(--spacing-unit) * 4) calc(var(--spacing-unit) * 2);
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: center; 
   min-height: 100vh;
   font-family: 'Georgia', serif; 
 }
 
+/* FIXED: Stripped card styling from container wrapper to eliminate the double-border effect */
 .container {
   width: 100%;
-  max-width: 850px;
-  background: var(--md-sys-color-surface);
-  border: 1px solid var(--md-sys-color-outline);
-  padding: calc(var(--spacing-unit) * 4);
-  box-shadow: 0 4px 20px rgba(100, 110, 90, 0.05); /* Extremely soft, ambient shadow */
+  max-width: 800px; 
+  background: transparent;
+  border: none;
+  padding: 0;
+  box-shadow: none;
 }
 
 header {
@@ -66,14 +67,13 @@ h1 {
   margin-top: 6px;
 }
 
-/* Horizontal Clean Control Layout */
 .controls {
   display: flex;
   flex-direction: column;
   gap: calc(var(--spacing-unit) * 2);
   align-items: center;
   background: var(--md-sys-color-primary-container);
-  padding: calc(var(--spacing-unit) * 2);
+  padding: calc(var(--spacing-unit) * 2.5);
   border: 1px solid var(--md-sys-color-outline);
   margin-bottom: calc(var(--spacing-unit) * 4);
   border-radius: var(--radius-sharp);
@@ -96,11 +96,9 @@ h1 {
   color: var(--md-sys-color-on-surface-variant);
   font-weight: 500;
   font-size: 0.9rem;
-  
-  /* Adds a comfortable, soft breathing room between text and select dropdown */
   display: inline-flex;
   align-items: center;
-  gap: calc(var(--spacing-unit) * 1.5); /* ~12px of space */
+  gap: calc(var(--spacing-unit) * 1.5);
 }
 
 .controls select {
@@ -139,14 +137,13 @@ h1 {
   opacity: 0.9;
 }
 
-/* Split Column Sheet Layout */
 .character-sheet {
   display: grid;
   grid-template-columns: 1fr;
   gap: calc(var(--spacing-unit) * 3);
 }
 
-@media (min-width: 700px) {
+@media (min-width: 600px) {
   .character-sheet {
     grid-template-columns: 2fr 3fr;
   }
@@ -158,13 +155,13 @@ h1 {
   border: 1px solid var(--md-sys-color-outline);
   background-color: var(--md-sys-color-primary-container);
   color: var(--md-sys-color-primary);
-  padding: calc(var(--spacing-unit) * 2);
+  padding: calc(var(--spacing-unit) * 3);
   border-radius: var(--radius-sharp);
 }
 
 .knight-identity h2 {
   margin: 0;
-  font-size: 1.6rem;
+  font-size: 1.8rem;
   letter-spacing: 0.5px;
 }
 
@@ -173,6 +170,7 @@ h1 {
   border: 1px solid var(--md-sys-color-outline);
   padding: calc(var(--spacing-unit) * 3);
   border-radius: var(--radius-sharp);
+  box-shadow: 0 4px 12px rgba(90, 100, 80, 0.04);
 }
 
 .section-title {
@@ -183,21 +181,21 @@ h1 {
   letter-spacing: 1.2px;
   color: var(--md-sys-color-primary);
   border-bottom: 1px solid var(--md-sys-color-outline);
-  padding-bottom: 4px;
+  padding-bottom: 6px;
   margin-top: 0;
-  margin-bottom: calc(var(--spacing-unit) * 2);
+  margin-bottom: calc(var(--spacing-unit) * 2.5);
 }
 
-/* Three-Column Compact Stat Grid Layout */
 .stat-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--spacing-unit);
+  gap: calc(var(--spacing-unit) * 1.5);
 }
 
+/* FIXED: Changed to soft borderless panels inside the card to prevent double lines */
 .stat-box {
   background: var(--md-sys-color-surface-variant);
-  border: 1px solid var(--md-sys-color-outline);
+  border: none;
   padding: calc(var(--spacing-unit) * 1.5);
   text-align: center;
   border-radius: var(--radius-sharp);
@@ -212,28 +210,28 @@ h1 {
 
 .stat-val {
   font-family: 'Courier New', Courier, monospace;
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   font-weight: bold;
-  margin: 2px 0;
+  margin: 4px 0;
   color: var(--md-sys-color-on-surface);
 }
 
 .stat-mod {
   font-family: system-ui, sans-serif;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--md-sys-color-primary);
 }
 
 .derived-container {
-  margin-top: calc(var(--spacing-unit) * 3);
+  margin-top: calc(var(--spacing-unit) * 4);
 }
 
 .derived-row {
   display: flex;
   justify-content: space-between;
   border-bottom: 1px dashed var(--md-sys-color-outline);
-  padding: calc(var(--spacing-unit)) 0;
+  padding: calc(var(--spacing-unit) * 1.5) 0;
   font-size: 0.95rem;
   color: var(--md-sys-color-on-surface-variant);
 }
@@ -251,16 +249,17 @@ h1 {
 
 .equipment-list {
   padding-left: calc(var(--spacing-unit) * 3);
-  line-height: 1.5;
+  line-height: 1.6;
   color: var(--md-sys-color-on-surface-variant);
-  margin-bottom: calc(var(--spacing-unit) * 3);
+  margin-bottom: calc(var(--spacing-unit) * 4);
 }
 
+/* FIXED: Changed to soft background panels inside the card to prevent double lines */
 .relic-box {
   background-color: var(--md-sys-color-highlight);
-  border: 1px solid var(--md-sys-color-outline);
+  border: none;
   color: var(--md-sys-color-on-highlight);
-  padding: calc(var(--spacing-unit) * 2);
+  padding: calc(var(--spacing-unit) * 2.5);
   border-radius: var(--radius-sharp);
 }
 
@@ -269,7 +268,7 @@ h1 {
   font-weight: 700;
   font-size: 0.8rem;
   text-transform: uppercase;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .loading {
@@ -280,9 +279,8 @@ h1 {
   padding: 40px;
 }
 
-/* History Log Styling Styles */
 .history-section {
-  margin-top: calc(var(--spacing-unit) * 4);
+  margin-top: calc(var(--spacing-unit) * 5);
   padding-top: calc(var(--spacing-unit) * 3);
   border-top: 1px dashed var(--md-sys-color-outline);
 }
@@ -380,4 +378,143 @@ h1 {
   text-overflow: ellipsis;
   width: 100%;
   margin-top: 2px;
+}
+
+/* Navigation Tabs */
+.app-navigation-tabs {
+  display: flex;
+  justify-content: center;
+  gap: calc(var(--spacing-unit) * 2);
+  margin-bottom: calc(var(--spacing-unit) * 4);
+  border-bottom: 1px solid var(--md-sys-color-outline);
+  padding-bottom: calc(var(--spacing-unit) * 2);
+}
+
+.nav-tab {
+  font-family: system-ui, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: transparent;
+  border: none;
+  color: var(--md-sys-color-secondary);
+  padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 3);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: var(--radius-sharp);
+}
+
+.nav-tab:hover {
+  background-color: var(--md-sys-color-surface-variant);
+  color: var(--md-sys-color-primary);
+}
+
+.nav-tab.active {
+  background-color: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-primary);
+  border: 1px solid var(--md-sys-color-outline);
+}
+
+/* ==========================================================================
+   PRINT OVERRIDES
+   ========================================================================== */
+@media print {
+  body, .generator-body-wrapper {
+    background: #ffffff !important;
+    color: #1a1a1a !important;
+    padding: 0 !important;
+    display: block !important;
+    min-height: auto !important;
+  }
+
+  .container {
+    border: none !important;
+    box-shadow: none !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+
+  header .subtitle,
+  .controls,
+  .button-group,
+  .history-section,
+  .clear-history-btn,
+  .loading,
+  .app-navigation-tabs {
+    display: none !important;
+  }
+
+  header {
+    margin-bottom: calc(var(--spacing-unit) * 3) !important;
+    padding-bottom: calc(var(--spacing-unit) * 2) !important;
+    border-bottom: 2px solid #000000 !important;
+  }
+
+  header h1 {
+    font-size: 2.2rem !important;
+    color: #000000 !important;
+  }
+
+  .knight-identity {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 2px solid #000000 !important;
+    border-radius: 0 !important;
+    padding: calc(var(--spacing-unit) * 2) !important;
+  }
+
+  .knight-identity h2 {
+    color: #000000 !important;
+  }
+
+  .character-sheet {
+    display: grid !important;
+    grid-template-columns: 2fr 3fr !important;
+    gap: calc(var(--spacing-unit) * 3) !important;
+    page-break-inside: avoid;
+  }
+
+  .card {
+    background: #ffffff !important;
+    border: 1px solid #000000 !important;
+    color: #000000 !important;
+    border-radius: 0 !important;
+    padding: calc(var(--spacing-unit) * 2.5) !important;
+    page-break-inside: avoid;
+  }
+
+  .section-title {
+    color: #000000 !important;
+    border-bottom: 1px solid #000000 !important;
+  }
+
+  .stat-box {
+    background: #ffffff !important;
+    border: 1px solid #000000 !important;
+    border-radius: 0 !important;
+  }
+
+  .stat-label, .stat-mod {
+    color: #000000 !important;
+  }
+
+  .derived-row {
+    background: #ffffff !important;
+    border-bottom: 1px dashed #000000 !important;
+    padding: 4px 0 !important;
+    color: #000000 !important;
+  }
+
+  .relic-box {
+    background-color: #ffffff !important;
+    border: 1px dashed #000000 !important;
+    color: #000000 !important;
+    border-radius: 0 !important;
+  }
+
+  .relic-title {
+    color: #000000 !important;
+  }
 }
