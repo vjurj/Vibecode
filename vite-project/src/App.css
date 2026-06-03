@@ -1,0 +1,383 @@
+:root {
+  /* Core Tones (Your Original Sage Green, Muted & Softened) */
+  --md-sys-color-primary: hsl(100, 15%, 35%);          /* Muted Sage Accent */
+  --md-sys-color-on-primary: hsl(100, 15%, 98%);
+  --md-sys-color-primary-container: hsl(100, 15%, 92%); /* Soft Sage Tint Tint */
+
+  --md-sys-color-secondary: hsl(100, 10%, 45%);         /* Gentle Green-Gray */
+  --md-sys-color-on-secondary: #ffffff;
+
+  --md-sys-color-surface: hsl(100, 12%, 96%);          /* Creamy, Soft Gray-Green Surface */
+  --md-sys-color-on-surface: hsl(100, 10%, 25%);        /* Muted Charcoal Text (Low Contrast) */
+  --md-sys-color-surface-variant: hsl(100, 8%, 91%);   /* Soft Secondary Background Tint */
+  --md-sys-color-on-surface-variant: hsl(100, 10%, 30%);
+
+  --md-sys-color-outline: hsl(100, 10%, 75%);          /* Very Soft, Low-Contrast Borders */
+
+  /* Highlight Tones (Pushed to a Soft, Muted Pastel Lavender) */
+  --md-sys-color-highlight: hsl(280, 25%, 90%);
+  --md-sys-color-on-highlight: hsl(280, 20%, 40%);
+
+  /* Spacing Adjustments for Clean Grid System */
+  --spacing-unit: 8px;
+  --radius-sharp: 4px; /* Softened slightly for a warmer aesthetic */
+}
+
+.generator-body-wrapper {
+  background-color: hsl(100, 10%, 93%); /* Calming, low-contrast outer background */
+  color: var(--md-sys-color-on-surface);
+  padding: calc(var(--spacing-unit) * 4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: 'Georgia', serif; 
+}
+
+.container {
+  width: 100%;
+  max-width: 850px;
+  background: var(--md-sys-color-surface);
+  border: 1px solid var(--md-sys-color-outline);
+  padding: calc(var(--spacing-unit) * 4);
+  box-shadow: 0 4px 20px rgba(100, 110, 90, 0.05); /* Extremely soft, ambient shadow */
+}
+
+header {
+  text-align: center;
+  margin-bottom: calc(var(--spacing-unit) * 4);
+  border-bottom: 1px dashed var(--md-sys-color-outline);
+  padding-bottom: calc(var(--spacing-unit) * 3);
+}
+
+h1 {
+  font-family: 'Times New Roman', serif;
+  color: var(--md-sys-color-primary);
+  font-size: 2.3rem;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.subtitle {
+  font-style: italic;
+  color: var(--md-sys-color-secondary);
+  font-size: 0.95rem;
+  margin-top: 6px;
+}
+
+/* Horizontal Clean Control Layout */
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--spacing-unit) * 2);
+  align-items: center;
+  background: var(--md-sys-color-primary-container);
+  padding: calc(var(--spacing-unit) * 2);
+  border: 1px solid var(--md-sys-color-outline);
+  margin-bottom: calc(var(--spacing-unit) * 4);
+  border-radius: var(--radius-sharp);
+}
+
+@media (min-width: 600px) {
+  .controls {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+.button-group {
+  display: flex;
+  gap: var(--spacing-unit);
+}
+
+.controls label {
+  font-family: system-ui, sans-serif;
+  color: var(--md-sys-color-on-surface-variant);
+  font-weight: 500;
+  font-size: 0.9rem;
+  
+  /* Adds a comfortable, soft breathing room between text and select dropdown */
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--spacing-unit) * 1.5); /* ~12px of space */
+}
+
+.controls select {
+  font-family: system-ui, sans-serif;
+  padding: 6px 12px;
+  border: 1px solid var(--md-sys-color-outline);
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  border-radius: var(--radius-sharp);
+}
+
+.controls button {
+  font-family: system-ui, sans-serif;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 8px 16px;
+  border: 1px solid var(--md-sys-color-outline);
+  cursor: pointer;
+  border-radius: var(--radius-sharp);
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.primary-btn {
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  border-color: var(--md-sys-color-primary) !important;
+}
+
+.secondary-btn {
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+}
+
+.controls button:hover {
+  opacity: 0.9;
+}
+
+/* Split Column Sheet Layout */
+.character-sheet {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: calc(var(--spacing-unit) * 3);
+}
+
+@media (min-width: 700px) {
+  .character-sheet {
+    grid-template-columns: 2fr 3fr;
+  }
+}
+
+.knight-identity {
+  grid-column: 1 / -1;
+  text-align: center;
+  border: 1px solid var(--md-sys-color-outline);
+  background-color: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-primary);
+  padding: calc(var(--spacing-unit) * 2);
+  border-radius: var(--radius-sharp);
+}
+
+.knight-identity h2 {
+  margin: 0;
+  font-size: 1.6rem;
+  letter-spacing: 0.5px;
+}
+
+.card {
+  background: var(--md-sys-color-surface);
+  border: 1px solid var(--md-sys-color-outline);
+  padding: calc(var(--spacing-unit) * 3);
+  border-radius: var(--radius-sharp);
+}
+
+.section-title {
+  font-family: system-ui, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--md-sys-color-primary);
+  border-bottom: 1px solid var(--md-sys-color-outline);
+  padding-bottom: 4px;
+  margin-top: 0;
+  margin-bottom: calc(var(--spacing-unit) * 2);
+}
+
+/* Three-Column Compact Stat Grid Layout */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-unit);
+}
+
+.stat-box {
+  background: var(--md-sys-color-surface-variant);
+  border: 1px solid var(--md-sys-color-outline);
+  padding: calc(var(--spacing-unit) * 1.5);
+  text-align: center;
+  border-radius: var(--radius-sharp);
+}
+
+.stat-label {
+  font-family: system-ui, sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--md-sys-color-secondary);
+}
+
+.stat-val {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 2px 0;
+  color: var(--md-sys-color-on-surface);
+}
+
+.stat-mod {
+  font-family: system-ui, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--md-sys-color-primary);
+}
+
+.derived-container {
+  margin-top: calc(var(--spacing-unit) * 3);
+}
+
+.derived-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed var(--md-sys-color-outline);
+  padding: calc(var(--spacing-unit)) 0;
+  font-size: 0.95rem;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.derived-row strong {
+  color: var(--md-sys-color-on-surface);
+}
+
+.lore-text {
+  line-height: 1.6;
+  font-style: italic;
+  color: var(--md-sys-color-on-surface-variant);
+  margin-bottom: calc(var(--spacing-unit) * 3);
+}
+
+.equipment-list {
+  padding-left: calc(var(--spacing-unit) * 3);
+  line-height: 1.5;
+  color: var(--md-sys-color-on-surface-variant);
+  margin-bottom: calc(var(--spacing-unit) * 3);
+}
+
+.relic-box {
+  background-color: var(--md-sys-color-highlight);
+  border: 1px solid var(--md-sys-color-outline);
+  color: var(--md-sys-color-on-highlight);
+  padding: calc(var(--spacing-unit) * 2);
+  border-radius: var(--radius-sharp);
+}
+
+.relic-title {
+  font-family: system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.loading {
+  font-family: system-ui, sans-serif;
+  font-weight: 500;
+  color: var(--md-sys-color-secondary);
+  text-align: center;
+  padding: 40px;
+}
+
+/* History Log Styling Styles */
+.history-section {
+  margin-top: calc(var(--spacing-unit) * 4);
+  padding-top: calc(var(--spacing-unit) * 3);
+  border-top: 1px dashed var(--md-sys-color-outline);
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: calc(var(--spacing-unit) * 2);
+}
+
+.history-title {
+  font-family: system-ui, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--md-sys-color-primary);
+  margin: 0;
+}
+
+.clear-history-btn {
+  font-family: system-ui, sans-serif;
+  background: transparent;
+  border: none;
+  color: var(--md-sys-color-secondary);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 4px;
+  text-decoration: underline;
+}
+
+.clear-history-btn:hover {
+  color: var(--md-sys-color-primary);
+}
+
+.history-badges {
+  display: flex;
+  gap: var(--spacing-unit);
+  flex-wrap: wrap;
+}
+
+.history-badge {
+  flex: 1;
+  min-width: 120px;
+  max-width: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: calc(var(--spacing-unit) * 1.5);
+  background: var(--md-sys-color-surface-variant);
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: var(--radius-sharp);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.history-badge:hover {
+  background: var(--md-sys-color-primary-container);
+}
+
+.history-badge.active {
+  background: var(--md-sys-color-primary);
+  border-color: var(--md-sys-color-primary);
+}
+
+.history-badge.active .badge-name {
+  color: var(--md-sys-color-on-primary);
+}
+
+.history-badge.active .badge-title {
+  color: var(--md-sys-color-on-primary);
+  opacity: 0.7;
+}
+
+.badge-name {
+  font-family: 'Georgia', serif;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: var(--md-sys-color-on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+.badge-title {
+  font-family: system-ui, sans-serif;
+  font-size: 0.7rem;
+  color: var(--md-sys-color-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  margin-top: 2px;
+}

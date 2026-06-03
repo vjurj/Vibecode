@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JSON Schema & Object Repository Pro</title>
+  <style>
+    :root {
+      /* Core Tones */
+      --md-sys-color-primary: hsl(100, 15%, 30%);
+      --md-sys-color-on-primary: hsl(100, 15%, 98%);
+      --md-sys-color-primary-container: hsl(100, 15%, 90%);
+
+      --md-sys-color-secondary: hsl(130, 10%, 40%);
+      --md-sys-color-on-secondary: #ffffff;
+
+      --md-sys-color-surface: hsl(100, 5%, 98%);
+      --md-sys-color-on-surface: hsl(100, 5%, 10%);
+      --md-sys-color-surface-variant: hsl(100, 10%, 90%);
+      --md-sys-color-on-surface-variant: hsl(100, 10%, 20%);
+
+      --md-sys-color-outline: hsl(100, 10%, 50%);
+
+      /* Highlight Tones */
+      --md-sys-color-highlight: hsl(280, 40%, 85%);
+      --md-sys-color-on-highlight: hsl(280, 40%, 20%);
+
+      --spacing-unit: 4px;
+      --radius-xs: 4px;
+      --radius-s: 8px;
+      --radius-m: 12px;
+      --radius-l: 16px;
+      --radius-full: 9999px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    html, body {
+      height: 100vh;
+      overflow: hidden;
+      background-color: var(--md-sys-color-surface);
+      color: var(--md-sys-color-on-surface);
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background-color: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+      padding: calc(var(--spacing-unit) * 3) calc(var(--spacing-unit) * 4);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+    }
+
+    header h1 {
+      font-size: 1.25rem;
+      font-weight: 500;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: calc(var(--spacing-unit) * 2);
+    }
+
+    .file-import-label {
+      background-color: var(--md-sys-color-highlight);
+      color: var(--md-sys-color-on-highlight);
+      padding: 6px 12px;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+
+    /* Three-Column Application Work Grid */
+    .app-workspace {
+      display: grid;
+      grid-template-columns: 320px 1fr 340px;
+      flex: 1;
+      height: calc(100vh - 54px);
+      overflow: hidden;
+    }
+
+    .panel {
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--md-sys-color-surface-variant);
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: calc(var(--spacing-unit) * 3);
+      background-color: var(--md-sys-color-surface-variant);
+      border-bottom: 1px solid var(--md-sys-color-outline);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .panel-scroll-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: calc(var(--spacing-unit) * 3);
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--spacing-unit) * 3);
+    }
+
+    .panel-footer-sticky {
+      padding: calc(var(--spacing-unit) * 3);
+      background-color: var(--md-sys-color-surface-variant);
+      border-top: 1px solid var(--md-sys-color-outline);
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    /* List Custom Controls */
+    .list-container {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .list-item {
+      background-color: rgba(0,0,0,0.02);
+      padding: calc(var(--spacing-unit) * 2.5);
+      border-radius: var(--radius-s);
+      border: 1px solid transparent;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .list-item:hover { border-color: var(--md-sys-color-primary); }
+    .list-item.active { background-color: var(--md-sys-color-primary-container); }
+
+    /* Structural Table UI */
+    .table-wrapper {
+      border: 1px solid var(--md-sys-color-outline);
+      border-radius: var(--radius-s);
+      overflow: hidden;
+    }
+
+    .object-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .object-table th, .object-table td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid var(--md-sys-color-surface-variant);
+    }
+
+    .object-table th { background: var(--md-sys-color-surface-variant); }
+    .object-table tr:hover { background: rgba(0,0,0,0.02); }
+    .object-table tr.active-row { background: var(--md-sys-color-highlight) !important; }
+
+    /* Forms */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+
+    label { font-size: 0.8rem; font-weight: 600; color: var(--md-sys-color-on-surface-variant); }
+    input, select, textarea {
+      padding: 8px;
+      border: 1px solid var(--md-sys-color-outline);
+      border-radius: var(--radius-xs);
+      background: var(--md-sys-color-surface);
+      color: var(--md-sys-color-on-surface);
+      font-size: 0.9rem;
+    }
+
+    .property-builder-card {
+      background: rgba(0,0,0,0.01);
+      border: 1px solid var(--md-sys-color-outline);
+      border-radius: var(--radius-s);
+      padding: 10px;
+      margin-bottom: 8px;
+    }
+
+    .array-item-block {
+      background: rgba(0,0,0,0.02);
+      border: 1px dashed var(--md-sys-color-outline);
+      padding: 8px;
+      border-radius: var(--radius-s);
+      margin-bottom: 8px;
+    }
+
+    .btn {
+      padding: 6px 12px;
+      border: none;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    .btn-primary { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
+    .btn-secondary { background: var(--md-sys-color-secondary); color: white; }
+    .btn-danger { background: hsl(0, 70%, 40%); color: white; }
+
+    textarea.code-view {
+      font-family: monospace;
+      font-size: 0.75rem;
+      height: 45%;
+      resize: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>📦 SchemaForge Pro Workspace</h1>
+    <div class="header-actions">
+      <label class="file-import-label" for="global-import">📥 Global Manifest Import</label>
+      <input type="file" id="global-import" accept=".json" style="display: none;" onchange="handleGlobalImport(event)">
+      <button class="btn btn-secondary" onclick="exportData('schemas')">Export Schemas</button>
+      <button class="btn btn-secondary" onclick="exportData('objects')">Export Objects</button>
+    </div>
+  </header>
+
+  <div class="app-workspace">
+    
+    <div class="panel">
+      <div class="panel-header">
+        <span>Blueprint Blueprints</span>
+        <button class="btn btn-primary" onclick="initNewSchema()">+ Add</button>
+      </div>
+      <div class="panel-scroll-content">
+        <div class="list-container" id="schema-list-target"></div>
+        
+        <div style="margin-top: auto; border-top: 1px solid var(--md-sys-color-outline); padding-top: 12px;">
+          <div class="panel-header" style="padding: 6px 0; background: none; border: none;">
+            <span>Instanced Records</span>
+            <button id="btn-new-inst" class="btn btn-secondary" style="display:none;" onclick="clearObjectFormToNew()">+ New Instance</button>
+          </div>
+          <div class="table-wrapper">
+            <table class="object-table">
+              <thead>
+                <tr><th>Name</th><th>Model</th><th style="width:30px;"></th></tr>
+              </thead>
+              <tbody id="object-table-target"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="border-right: 1px solid var(--md-sys-color-outline);">
+      <div class="panel-header" id="editor-title-ctx">Blueprint Configuration Panel</div>
+      <div class="panel-scroll-content">
+        
+        <div id="schema-editor-view">
+          <div class="form-group">
+            <label>Model Architecture Title Identifier</label>
+            <input type="text" id="schema-meta-title" placeholder="e.g., Inventory Item Record">
+          </div>
+          <div style="margin-top: 12px;">
+            <label style="display:block; margin-bottom: 6px;">Field Constraints Engine</label>
+            <div id="schema-properties-root-container"></div>
+            <button class="btn btn-secondary" onclick="addPropertyFieldRow()">+ Add Primitive Field Property</button>
+          </div>
+        </div>
+
+        <div id="object-instance-view" style="display: none;">
+          <form id="dynamic-generation-form" onsubmit="commitObjectDataValue(event)">
+            <div id="dynamic-form-fields-target"></div>
+          </form>
+        </div>
+
+      </div>
+      <div class="panel-footer-sticky" id="editor-sticky-footer">
+        <button class="btn btn-danger" id="btn-delete-ctx" style="display: none;" onclick="deleteCurrentContext()">Delete Block</button>
+        <button class="btn btn-primary" id="btn-save-ctx" onclick="commitSchemaStructure()">Save Structural Definition Blueprint</button>
+      </div>
+    </div>
+
+    <div class="panel" style="border-right: none;">
+      <div class="panel-header">Live Output Specifications</div>
+      <div class="panel-scroll-content" style="gap: 8px;">
+        <label>JSON-Schema Validation Layer Object Spec</label>
+        <textarea class="code-view" id="raw-schema-out" readonly></textarea>
+        
+        <label style="margin-top: 8px;">Dynamic Value Data Layer Object Instance Mapping</label>
+        <textarea class="code-view" id="raw-instance-out" readonly></textarea>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let state = { schemas: {}, objects: [], currentSchemaId: null, currentObjectId: null };
+
+    // Initialization Hook with Automatic LocalStorage Cache Syncing
+    window.onload = function() {
+      const stored = localStorage.getItem('schema_forge_workspace_state');
+      if (stored) {
+        try {
+          state = JSON.parse(stored);
+          renderSchemaSelectors();
+          renderObjectDataTable();
+        } catch(e) { localStorage.removeItem('schema_forge_workspace_state'); }
+      } else {
+        initNewSchema();
+      }
+    };
+
+    function saveStateToLocalStorage() {
+      localStorage.setItem('schema_forge_workspace_state', JSON.stringify(state));
+    }
+
+    function initNewSchema() {
+      state.currentSchemaId = null;
+      state.currentObjectId = null;
+      document.getElementById('editor-title-ctx').innerText = "Create Structural Definition Blueprint";
+      document.getElementById('schema-meta-title').value = "";
+      document.getElementById('schema-properties-root-container').innerHTML = "";
+      document.getElementById('schema-editor-view').style.display = "block";
+      document.getElementById('object-instance-view').style.display = "none";
+      document.getElementById('btn-delete-ctx').style.display = "none";
+      document.getElementById('btn-new-inst').style.display = "none";
+      document.getElementById('btn-save-ctx').innerText = "Save Blueprint Model";
+      document.getElementById('btn-save-ctx').setAttribute('onclick', 'commitSchemaStructure()');
+      addPropertyFieldRow();
+      syncCodeViews();
+    }
+
+    function addPropertyFieldRow(k="", t="string", req=false, extra=null) {
+      const parent = document.getElementById('schema-properties-root-container');
+      const rId = 'row_' + Math.random().toString(36).substr(2, 9);
+      const div = document.createElement('div');
+      div.className = 'property-builder-card';
+      div.id = rId;
+      div.innerHTML = `
+        <div style="display:grid; grid-template-columns: 1fr 1fr auto; gap:8px; align-items:center;">
+          <input type="text" class="p-name" value="${k}" placeholder="Property Key Name" required>
+          <select class="p-type" onchange="handlePropTypeDelta('${rId}')">
+            <option value="string" ${t==='string'?'selected':''}>String Scalar</option>
+            <option value="number" ${t==='number'?'selected':''}>Numeric Scalar</option>
+            <option value="boolean" ${t==='boolean'?'selected':''}>Boolean Switch</option>
+            <option value="array_object" ${t==='array_object'?'selected':''}>Array of Sub-Objects List</option>
+          </select>
+          <button class="btn btn-danger" onclick="document.getElementById('${rId}').remove()">X</button>
+        </div>
+        <div class="sub-prop-zone" style="margin-top:6px; display:none; padding-left:12px; border-left:2px dashed var(--md-sys-color-primary);"></div>
+      `;
+      parent.appendChild(div);
+      if(t === 'array_object') handlePropTypeDelta(rId, extra);
+    }
+
+    function handlePropTypeDelta(rId, fallback=null) {
+      const row = document.getElementById(rId);
+      const type = row.querySelector('.p-type').value;
+      const zone = row.querySelector('.sub-prop-zone');
+      zone.innerHTML = "";
+      if(type === 'array_object') {
+        zone.style.display = "block";
+        zone.innerHTML = `
+          <label style="font-size:0.7rem; margin-bottom:4px; display:block;">Sub-Object Key Matrix</label>
+          <div class="matrix-target"></div>
+          <button type="button" class="btn btn-secondary" style="padding:2px 8px; font-size:0.7rem;" onclick="addMatrixFieldRow('${rId}')">+ Add Key Field Column</button>
+        `;
+        if(fallback && fallback.subProps) {
+          Object.entries(fallback.subProps).forEach(([subK, subV]) => addMatrixFieldRow(rId, subK, subV.type));
+        } else {
+          addMatrixFieldRow(rId);
+        }
+      } else { zone.style.display = "none"; }
+    }
+
+    function addMatrixFieldRow(rId, subK="", subT="string") {
+      const target = document.getElementById(rId).querySelector('.matrix-target');
+      const mId = 'matrix_' + Math.random().toString(36).substr(2, 9);
+      const div = document.createElement('div');
+      div.id = mId;
+      div.style = "display:grid; grid-template-columns: 1fr 1fr auto; gap:6px; margin-bottom:4px;";
+      div.innerHTML = `
+        <input type="text" class="m-name" value="${subK}" placeholder="Sub Key" style="padding:4px; font-size:0.8rem;" required>
+        <select class="m-type" style="padding:4px; font-size:0.8rem;">
+          <option value="string" ${subT==='string'?'selected':''}>String</option>
+          <option value="number" ${subT==='number'?'selected':''}>Number</option>
+        </select>
+        <button type="button" class="btn btn-danger" style="padding:2px 6px;" onclick="document.getElementById('${mId}').remove()">X</button>
+      `;
+      target.appendChild(div);
+    }
+
+    function commitSchemaStructure() {
+      const title = document.getElementById('schema-meta-title').value.trim();
+      if(!title) return alert("Architecture title required.");
+      const rows = document.querySelectorAll('#schema-properties-root-container .property-builder-card');
+      if(!rows.length) return alert("Must register at least one data structural property validation vector mapping path element row block.");
+      
+      const properties = {};
+      let valid = true;
+      rows.forEach(r => {
+        const k = r.querySelector('.p-name').value.trim();
+        const t = r.querySelector('.p-type').value;
+        if(!k) return valid = false;
+        properties[k] = { type: t };
+        if(t === 'array_object') {
+          properties[k].subProps = {};
+          const mRows = r.querySelectorAll('.matrix-target > div');
+          if(!mRows.length) valid = false;
+          mRows.forEach(m => {
+            const mk = m.querySelector('.m-name').value.trim();
+            const mt = m.querySelector('.m-type').value;
+            if(!mk) return valid = false;
+            properties[k].subProps[mk] = { type: mt };
+          });
+        }
+      });
+      if(!valid) return alert("Please fill out all labels.");
+      const sId = state.currentSchemaId || 'schema_' + Date.now();
+      state.schemas[sId] = { id: sId, title, properties };
+      state.currentSchemaId = sId;
+      saveStateToLocalStorage();
+      renderSchemaSelectors();
+      loadSchemaContextEditor(sId);
+    }
+
+    function renderSchemaSelectors() {
+      const c = document.getElementById('schema-list-target');
+      c.innerHTML = "";
+      Object.values(state.schemas).forEach(s => {
+        const d = document.createElement('div');
+        d.className = `list-item ${state.currentSchemaId === s.id ? 'active' : ''}`;
+        d.innerHTML = `<div><strong>${s.title}</strong><div style="font-size:0.75rem; opacity:0.7;">${Object.keys(s.properties).length} keys defined</div></div>`;
+        d.onclick = () => loadSchemaContextEditor(s.id);
+        c.appendChild(d);
+      });
+    }
+
+    function loadSchemaContextEditor(sId) {
+      state.currentSchemaId = sId;
+      state.currentObjectId = null;
+      const s = state.schemas[sId];
+      document.getElementById('editor-title-ctx').innerText = `Architecture Profile Mapping Blueprint: ${s.title}`;
+      document.getElementById('schema-meta-title').value = s.title;
+      document.getElementById('schema-properties-root-container').innerHTML = "";
+      Object.entries(s.properties).forEach(([k,v]) => addPropertyFieldRow(k, v.type, false, v));
+      
+      document.getElementById('schema-editor-view').style.display = "block";
+      document.getElementById('object-instance-view').style.display = "none";
+      document.getElementById('btn-delete-ctx').style.display = "inline-block";
+      document.getElementById('btn-new-inst').style.display = "inline-block";
+      document.getElementById('btn-save-ctx').innerText = "Save Blueprint Model Updates";
+      document.getElementById('btn-save-ctx').setAttribute('onclick', 'commitSchemaStructure()');
+      renderSchemaSelectors();
+      renderObjectDataTable();
+      syncCodeViews();
+    }
+
+    // --- INSTANCE HANDLERS ---
+    function clearObjectFormToNew() {
+      state.currentObjectId = null;
+      const s = state.schemas[state.currentSchemaId];
+      document.getElementById('editor-title-ctx').innerText = `Instantiate Data Sandbox Payload Container: ${s.title}`;
+      document.getElementById('schema-editor-view').style.display = "none";
+      document.getElementById('object-instance-view').style.display = "block";
+      document.getElementById('btn-delete-ctx').style.display = "none";
+      document.getElementById('btn-save-ctx').innerText = "Save Object Payload Entry Data Record Line";
+      document.getElementById('btn-save-ctx').setAttribute('onclick', 'triggerFormSubmit()');
+      
+      const container = document.getElementById('dynamic-form-fields-target');
+      container.innerHTML = "";
+      Object.entries(s.properties).forEach(([k,v]) => container.appendChild(generateFormUiFieldNode(k, v, `root_${k}`)));
+      renderObjectDataTable();
+      syncLivePayloadView();
+    }
+
+    function generateFormUiFieldNode(k, config, idPrefix) {
+      const g = document.createElement('div');
+      g.className = "form-group";
+      g.innerHTML = `<label>${k} <span style="font-size:0.7rem; font-weight:normal; opacity:0.6;">[${config.type}]</span></label>`;
+      if(config.type === 'string') {
+        g.innerHTML += `<input type="text" id="${idPrefix}" data-key="${k}" oninput="syncLivePayloadView()">`;
+      } else if(config.type === 'number') {
+        g.innerHTML += `<input type="number" step="any" id="${idPrefix}" data-key="${k}" oninput="syncLivePayloadView()">`;
+      } else if(config.type === 'boolean') {
+        g.innerHTML += `<input type="checkbox" id="${idPrefix}" data-key="${k}" onchange="syncLivePayloadView()">`;
+      } else if(config.type === 'array_object') {
+        const shell = document.createElement('div');
+        shell.className = "array-container-shell";
+        shell.id = idPrefix;
+        shell.dataset.key = k;
+        shell.dataset.type = "array_object";
+        shell.innerHTML = `<div class="items-target"></div><button type="button" class="btn btn-secondary" style="margin-top:4px;" onclick="addArrItemInstanceDomNode('${idPrefix}', ${JSON.stringify(config.subProps).replace(/"/g, '&quot;')})">+ Append List Segment Array Index Block Row Row</button>`;
+        g.appendChild(shell);
+      }
+      return g;
+    }
+
+    function addArrItemInstanceDomNode(parentPrefix, subProps, fallback=null) {
+      const target = document.getElementById(parentPrefix).querySelector('.items-target');
+      const itemId = 'item_' + Math.random().toString(36).substr(2, 9);
+      const div = document.createElement('div');
+      div.className = "array-item-block";
+      div.id = itemId;
+      Object.entries(subProps).forEach(([sk, sv]) => {
+        div.innerHTML += `<label style="font-size:0.75rem; color:var(--md-sys-color-secondary);">${sk}</label>`;
+        if(sv.type==='number') {
+          div.innerHTML += `<input type="number" step="any" class="sub-input" data-sub-key="${sk}" oninput="syncLivePayloadView()">`;
+        } else {
+          div.innerHTML += `<input type="text" class="sub-input" data-sub-key="${sk}" oninput="syncLivePayloadView()">`;
+        }
+      });
+      div.innerHTML += `<button type="button" class="btn btn-danger" style="padding:2px 8px; margin-top:4px;" onclick="document.getElementById('${itemId}').remove(); syncLivePayloadView();">Remove Entry</button>`;
+      target.appendChild(div);
+      
+      if(fallback) {
+        Object.entries(subProps).forEach(([sk, sv]) => {
+          const inp = div.querySelector(`[data-sub-key="${sk}"]`);
+          if(inp) inp.value = fallback[sk] !== undefined ? fallback[sk] : "";
+        });
+      }
+      syncLivePayloadView();
+    }
+
+    function extractFormValues() {
+      if(!state.currentSchemaId) return {};
+      const s = state.schemas[state.currentSchemaId];
+      const payload = {};
+      Object.entries(s.properties).forEach(([k,v]) => {
+        const el = document.getElementById(`root_${k}`);
+        if(!el) return;
+        if(v.type === 'string') payload[k] = el.value;
+        else if(v.type === 'number') payload[k] = el.value === "" ? undefined : Number(el.value);
+        else if(v.type === 'boolean') payload[k] = el.checked;
+        else if(v.type === 'array_object') {
+          payload[k] = [];
+          el.querySelectorAll('.array-item-block').forEach(b => {
+            const rowData = {};
+            b.querySelectorAll('.sub-input').forEach(inp => {
+              const subK = inp.dataset.subKey;
+              rowData[subK] = inp.type === 'number' && inp.value!=="" ? Number(inp.value) : inp.value;
+            });
+            payload[k].push(rowData);
+          });
+        }
+      });
+      return payload;
+    }
+
+    function syncLivePayloadView() {
+      const vals = extractFormValues();
+      document.getElementById('raw-instance-out').value = Object.keys(vals).length ? JSON.stringify(vals, null, 2) : "";
+    }
+
+    function triggerFormSubmit() {
+      document.getElementById('dynamic-generation-form').requestSubmit();
+    }
+
+    function commitObjectDataValue(e) {
+      if(e) e.preventDefault();
+      const vals = extractFormValues();
+      if(state.currentObjectId) {
+        const match = state.objects.find(o => o.id === state.currentObjectId);
+        if(match) match.valueMapping = vals;
+      } else {
+        state.objects.push({ id: 'inst_' + Date.now(), schemaId: state.currentSchemaId, valueMapping: vals });
+      }
+      saveStateToLocalStorage();
+      clearObjectFormToNew();
+    }
+
+    function loadObjectInstanceEditor(oId) {
+      const o = state.objects.find(obj => obj.id === oId);
+      if(!o) return;
+      state.currentObjectId = o.id;
+      state.currentSchemaId = o.schemaId;
+      
+      const s = state.schemas[o.schemaId];
+      document.getElementById('editor-title-ctx').innerText = `Modify Object Instance Sandbox Container File Path Metadata View`;
+      document.getElementById('schema-editor-view').style.display = "none";
+      document.getElementById('object-instance-view').style.display = "block";
+      document.getElementById('btn-delete-ctx').style.display = "inline-block";
+      document.getElementById('btn-save-ctx').innerText = "Update Structural Changes Local Index Payload Instance Row";
+      document.getElementById('btn-save-ctx').setAttribute('onclick', 'triggerFormSubmit()');
+
+      const container = document.getElementById('dynamic-form-fields-target');
+      container.innerHTML = "";
+      Object.entries(s.properties).forEach(([k,v]) => {
+        container.appendChild(generateFormUiFieldNode(k, v, `root_${k}`));
+        const val = o.valueMapping[k];
+        const el = document.getElementById(`root_${k}`);
+        if(!el) return;
+        if(v.type==='string' || v.type==='number') el.value = val !== undefined ? val : "";
+        else if(v.type==='boolean') el.checked = !!val;
+        else if(v.type==='array_object' && Array.isArray(val)) {
+          val.forEach(item => addArrItemInstanceDomNode(`root_${k}`, v.subProps, item));
+        }
+      });
+      renderObjectDataTable();
+      syncCodeViews();
+    }
+
+    function renderObjectDataTable() {
+      const target = document.getElementById('object-table-target');
+      target.innerHTML = "";
+      if(!state.objects.length) {
+        target.innerHTML = `<tr><td colspan="3" style="text-align:center; opacity:0.4; font-style:italic; font-size:0.75rem;">No internal elements generated inside index buffers.</td></tr>`;
+        return;
+      }
+      state.objects.forEach(o => {
+        const s = state.schemas[o.schemaId] || { title: "Deleted Blueprint Architecture" };
+        let name = "";
+        const pKeys = ['name', 'title', 'id', 'label'];
+        for(let pk of pKeys) { if(o.valueMapping && o.valueMapping[pk]) { name = String(o.valueMapping[pk]); break; } }
+        if(!name) name = `${s.title} Entry Instance`;
+
+        const tr = document.createElement('tr');
+        if(state.currentObjectId === o.id) tr.className = "active-row";
+        tr.onclick = () => loadObjectInstanceEditor(o.id);
+        tr.innerHTML = `
+          <td><strong>${name}</strong></td>
+          <td><span class="badge" style="background:#ddd; padding:2px 4px; font-size:0.7rem; border-radius:4px;">${s.title}</span></td>
+          <td><button class="btn btn-danger" style="padding:2px 6px; font-size:0.7rem;" onclick="event.stopPropagation(); deleteTargetObjectEntryBuffer('${o.id}')">X</button></td>
+        `;
+        target.appendChild(tr);
+      });
+    }
+
+    function deleteTargetObjectEntryBuffer(oId) {
+      state.objects = state.objects.filter(o => o.id !== oId);
+      if(state.currentObjectId === oId) initNewSchema();
+      saveStateToLocalStorage();
+      renderObjectDataTable();
+    }
+
+    function deleteCurrentContext() {
+      if(state.currentObjectId) {
+        deleteTargetObjectEntryBuffer(state.currentObjectId);
+      } else if(state.currentSchemaId) {
+        if(!confirm("Purge active scheme profile matching specifications along with dependent parameters?")) return;
+        state.objects = state.objects.filter(o => o.schemaId !== state.currentSchemaId);
+        delete state.schemas[state.currentSchemaId];
+        saveStateToLocalStorage();
+        initNewSchema();
+        renderSchemaSelectors();
+      }
+    }
+
+    function syncCodeViews() {
+      if(!state.currentSchemaId) {
+        document.getElementById('raw-schema-out').value = "";
+        document.getElementById('raw-instance-out').value = "";
+        return;
+      }
+      const s = state.schemas[state.currentSchemaId];
+      const validJsonSchema = {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": s.title,
+        "type": "object",
+        "properties": {}
+      };
+      Object.entries(s.properties).forEach(([k,v]) => {
+        if(v.type === 'array_object') {
+          const innerSub = { type: "object", properties: {} };
+          Object.entries(v.subProps || {}).forEach(([sk, sv]) => innerSub.properties[sk] = { type: sv.type });
+          validJsonSchema.properties[k] = { type: "array", items: innerSub };
+        } else { validJsonSchema.properties[k] = { type: v.type }; }
+      });
+      document.getElementById('raw-schema-out').value = JSON.stringify(validJsonSchema, null, 2);
+      
+      if(state.currentObjectId) {
+        const o = state.objects.find(obj => obj.id === state.currentObjectId);
+        document.getElementById('raw-instance-out').value = o ? JSON.stringify(o.valueMapping, null, 2) : "";
+      } else { syncLivePayloadView(); }
+    }
+
+    function exportData(type) {
+      const data = type === 'schemas' ? state.schemas : state.objects;
+      const b = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(b);
+      a.download = `repository_${type}_manifest_export.json`;
+      a.click();
+    }
+
+    function handleGlobalImport(e) {
+      const f = e.target.files[0]; if(!f) return;
+      const r = new FileReader();
+      r.onload = function(evt) {
+        try {
+          const json = JSON.parse(evt.target.result);
+          if(json && typeof json === 'object') {
+            if(Array.isArray(json)) {
+              state.objects = [...state.objects, ...json];
+            } else {
+              Object.entries(json).forEach(([k,v]) => {
+                if(v.properties) state.schemas[k] = v;
+                else state.objects.push(v);
+              });
+            }
+            saveStateToLocalStorage();
+            renderSchemaSelectors();
+            renderObjectDataTable();
+            alert("Payload array index strings synchronized successfully.");
+          }
+        } catch(err) { alert("Malformed system config code format structural stream."); }
+      };
+      r.readAsText(f);
+    }
+  </script>
+</body>
+</html>
