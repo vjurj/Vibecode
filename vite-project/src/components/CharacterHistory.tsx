@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function CharacterHistory({ history, currentId, onSelectKnight, onClear }) {
   if (history.length <= 1) return null;
 

@@ -1,6 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-// import { KNIGHT_DATA } from './constants';
-// import CharacterHistory from './CharacterHistory'; // New Component
 import '../App.css';
 import CharacterHistory from '../components/CharacterHistory';
 import { Controls } from '../components/Controls';
@@ -94,12 +92,11 @@ export default function KnightGenerator() {
   if (!knight) return <div className="loading">Forging your knight...</div>;
 
   return (
-    <div className="generator-body-wrapper">
       <div className="container">
-        <header>
+        {/* <header>
           <h1>OSR Mythical Knight</h1>
           <div className="subtitle">An Old-School Renaissance Character Generator</div>
-        </header>
+        </header> */}
 
         <Controls 
           flavor={flavor} 
@@ -159,6 +156,5 @@ export default function KnightGenerator() {
           onClear={clearHistory}
         />
       </div>
-    </div>
   );
 }

@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { SETTLEMENT_DATA } from '../model/settlementConstants';
+import { ControlsSettlement } from '../components/ControlsSettlement';
 
 // Quick helper to grab a random array item
 const getRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
@@ -51,27 +52,13 @@ export function SettlementGenerator() {
   return (
     <div>
       {/* Top Controls Interface block matches your layout exactly */}
-      <div className="controls">
-        <label>
-          Region Atmosphere:
-          <select value={flavor} onChange={(e) => setFlavor(e.target.value)}>
-            <option value="all">All Combined Wilds</option>
-            <option value="lotr">High Mythic Borderlands</option>
-            <option value="witcher">Grim Grit Villages</option>
-            <option value="symbaroum">Dark Corruption Frontier</option>
-            <option value="elden">Shattered Lands Ruins</option>
-          </select>
-        </label>
-
-        <div className="button-group">
-          <button onClick={generateSettlement} className="primary-btn">
-            Scout Next Hex
-          </button>
-          <button onClick={copyToClipboard} className="secondary-btn">
-            {copied ? "✓ Copied!" : "Copy Details"}
-          </button>
-        </div>
-      </div>
+        <ControlsSettlement
+            flavor={flavor} 
+            setFlavor={setFlavor} 
+            onRoll={generateSettlement} 
+            onCopy={copyToClipboard}
+            copied={copied} 
+        />
 
       {/* Two Column Grid layout mirroring your prior format exactly */}
       <div className="character-sheet">
